@@ -9,14 +9,18 @@ import spotipy.util as util
 # Some songs don't have an id, if that happens resort to name matching
 
 
-def find_song_in_playlists(song_id):
+def find_song_in_playlists(song_uri):
+    # TODO Make it so all playlists gone through, method has limit to how many shown at a time
     playlists = sp.current_user_playlists()
     for playlist in playlists['items']:
         print(playlist['name'])
         tracks = sp.playlist_tracks(playlist['id'])
 
         for track in tracks['items']:
-            print(track)
+            if song_uri == track['track']['uri']:
+                print(f"Found in Playlist {playlist['name']}")
+                break
+
 
 
 def translate_search_query(query):
@@ -31,4 +35,4 @@ if __name__ == '__main__':
     # search = input('Search Song: ')
     # print(sp.search(search))
 
-    find_song_in_playlists('test')
+    find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')  # Testing with song Melancolia by Caravan Palace
