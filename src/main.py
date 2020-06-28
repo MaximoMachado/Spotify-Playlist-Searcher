@@ -13,14 +13,28 @@ def find_song_in_playlists(song_uri):
     # TODO Make it so all playlists gone through, method has limit to how many shown at a time
     playlists = sp.current_user_playlists()
     for playlist in playlists['items']:
-        print(playlist['name'])
+        # print(playlist['name'])
         tracks = sp.playlist_tracks(playlist['id'])
 
-        for track in tracks['items']:
-            if song_uri == track['track']['uri']:
+        if is_track_in_tracks(song_uri, tracks):
+            print(f"Found in Playlist {playlist['name']}")
+        while tracks['next']:
+            tracks = sp.next(tracks)
+            if is_track_in_tracks(song_uri, tracks):
                 print(f"Found in Playlist {playlist['name']}")
-                break
 
+
+def is_track_in_tracks(song_uri, tracks):
+    """
+    Checks whether song is within a list of songs
+    :param song_uri: ID of target song
+    :param tracks: Page object of list of tracks
+    :return: @hether or a not a song is within a list of tracks
+    """
+    for track in tracks['items']:
+        if song_uri == track['track']['uri']:
+            return True
+    return False
 
 
 def translate_search_query(query):
