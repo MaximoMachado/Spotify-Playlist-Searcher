@@ -16,13 +16,28 @@ def is_track_in_tracks(song_uri, tracks):
 
 
 class SpotipyManager:
-    # TODO Add documentation
+    """
+    Manages Spotipy functions and implements additional functions useful to interacting with Spotipy
+    """
     def __init__(self, username):
-        token = util.prompt_for_user_token(username=username, scope='user-library-read playlist-read-private')
+        """
+        Initializes spotipy client with a prompted token from username
+        :param username: Username of Spotify Account
+        """
+        token = util.prompt_for_user_token(username=username, scope='user-library-read playlist-read-private', cache_path="./data/")
         self.sp = spotipy.Spotify(auth=token)
-
+    def get_spotipy_client(self):
+        """
+        Allows access to Spotipy to use its functions
+        :return: Spotipy client
+        """
+        return self.sp
     def find_song_in_playlists(self, song_uri):
-
+        """
+        For a particular song, search all user playlists and return matched playlists
+        :param song_uri: Unique ID of song on Spotify
+        :return: Set of Playlist IDs that song is found within
+        """
         found_playlist_ids = set()
 
         playlists = self.sp.current_user_playlists()
@@ -34,7 +49,13 @@ class SpotipyManager:
 
         return found_playlist_ids
 
-    def find_song_helper(self, song_uri, playlists, set_to_modify):
+    def _find_song_helper(self, song_uri, playlists, set_to_modify):
+        """
+        Adds to a set playlists that contain the song specified
+        :param song_uri: Unique ID of song on Spotify to find
+        :param playlists: Page Object of Playlists to search through
+        :param set_to_modify: Set that playlists are added to
+        """
         for playlist in playlists['items']:
             tracks = self.sp.playlist_tracks(playlist['id'])
 
