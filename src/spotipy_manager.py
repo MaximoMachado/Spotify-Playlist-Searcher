@@ -6,9 +6,10 @@ def is_track_in_tracks(song_uri, tracks):
     """
     Checks whether song is within a list of songs
     :param song_uri: ID of target song
-    :param tracks: Page object of list of tracks
+    :param tracks: Page object of list of playlist tracks
     :return: Whether or a not a song is within a list of tracks
     """
+    # TODO Make it applicable to both playlist tracks and tracks
     for playlist_track in tracks['items']:
         if song_uri == playlist_track['track']['uri']:
             return True
