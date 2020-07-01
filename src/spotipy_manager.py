@@ -1,5 +1,5 @@
 import spotipy
-import spotipy.util as util
+from spotipy.oauth2 import SpotifyOAuth
 
 
 def is_track_in_tracks(song_uri, tracks):
@@ -19,19 +19,22 @@ class SpotipyManager:
     """
     Manages Spotipy functions and implements additional functions useful to interacting with Spotipy
     """
-    def __init__(self, username):
+    def __init__(self):
         """
         Initializes spotipy client with a prompted token from username
         :param username: Username of Spotify Account
         """
-        token = util.prompt_for_user_token(username=username, scope='user-library-read playlist-read-private', cache_path="./data/")
-        self.sp = spotipy.Spotify(auth=token)
+        scope = 'user-library-read playlist-read-private'
+        auth = SpotifyOAuth(scope=scope, cache_path='./data/.cache-user')
+        self.sp = spotipy.Spotify(auth_manager=auth)
+
     def get_spotipy_client(self):
         """
         Allows access to Spotipy to use its functions
         :return: Spotipy client
         """
         return self.sp
+
     def find_song_in_playlists(self, song_uri):
         """
         For a particular song, search all user playlists and return matched playlists
@@ -42,10 +45,10 @@ class SpotipyManager:
 
         playlists = self.sp.current_user_playlists()
 
-        self.find_song_helper(song_uri, playlists, found_playlist_ids)
+        self._find_song_helper(song_uri, playlists, found_playlist_ids)
         while playlists['next']:
             playlists = self.sp.next(playlists)
-            self.find_song_helper(song_uri, playlists, found_playlist_ids)
+            self._find_song_helper(song_uri, playlists, found_playlist_ids)
 
         return found_playlist_ids
 
