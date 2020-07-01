@@ -1,7 +1,5 @@
 from src.spotipy_manager import *
 
-
-
 # First make command line program, then expand to application
 # Allow choice of permissions to read private playlists or not
 # Function to format search query correctly and allow advanced searching
