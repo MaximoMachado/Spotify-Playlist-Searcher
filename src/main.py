@@ -21,6 +21,7 @@ def find_song_in_playlists(song_uri):
 
     return found_playlist_ids
 
+
 def find_song_helper(song_uri, playlists, set_to_modify):
     for playlist in playlists['items']:
         tracks = sp.playlist_tracks(playlist['id'])
@@ -31,6 +32,7 @@ def find_song_helper(song_uri, playlists, set_to_modify):
             tracks = sp.next(tracks)
             if is_track_in_tracks(song_uri, tracks):
                 set_to_modify.add(playlist['id'])
+
 
 def is_track_in_tracks(song_uri, tracks):
     """
