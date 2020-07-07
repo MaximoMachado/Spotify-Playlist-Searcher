@@ -40,6 +40,29 @@ class SpotipyManager:
         """
         return self.sp
 
+    def get_name_from_uri(self, uri):
+        """
+        Gets Name of Song/Album/Playlist from its uri
+        :param uri: Unique id of object
+        :return: Name of object from uri
+        """
+        if 'spotify:' in uri:
+            # Format of uri is spotify
+            uri_type = uri.split(':')[1]
+            get_obj_from_id = getattr(self.sp, uri_type)
+
+            return get_obj_from_id(uri)['name']
+        else:
+            raise ValueError('uri string not in spotify uri format')
+
+    def get_playlist_name(self, playlist_id):
+        """
+        Gets name of a playlist from the id or uri
+        :param playlist_id: ID of playlist
+        :return: str Playlist Name
+        """
+        return self.sp.playlist(playlist_id)['name']
+
     def find_song_in_playlists(self, song_uri):
         """
         For a particular song, search all user playlists and return matched playlists
