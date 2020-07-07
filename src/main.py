@@ -13,5 +13,5 @@ if __name__ == '__main__':
     # Testing with song Melancolia by Caravan Palace
     playlists = spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')
     print(playlists)
-    print([spm.get_playlist_name(playlist_id) for playlist_id in playlists])
+    print([spm.get_name_from_uri(uri) for uri in playlists])
     print(spm.get_name_from_uri('spotify:track:7CK2ioYuFmjRKHRhsop0Ww'))

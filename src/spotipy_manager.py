@@ -27,7 +27,6 @@ class SpotipyManager:
     def __init__(self):
         """
         Initializes spotipy client with a prompted token from username
-        :param username: Username of Spotify Account
         """
         scope = 'user-library-read playlist-read-private'
         auth = SpotifyOAuth(scope=scope, cache_path='./data/.cache-user')
@@ -47,11 +46,11 @@ class SpotipyManager:
         :return: Name of object from uri
         """
         if 'spotify:' in uri:  # TODO Replace with regex
-            # Format of uri is spotify
+            # Format of uri is spotify:type:id
             uri_type = uri.split(':')[1]
-            get_obj_from_id = getattr(self.sp, uri_type)
+            get_obj_from_uri = getattr(self.sp, uri_type)
 
-            return get_obj_from_id(uri)['name']
+            return get_obj_from_uri(uri)['name']
         else:
             raise ValueError('uri string not in spotify uri format')
 
