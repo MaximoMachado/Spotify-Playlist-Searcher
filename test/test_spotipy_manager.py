@@ -31,9 +31,9 @@ class TestSpotipyManager(unittest.TestCase):
     def test_find_song_in_playlists(self):
         playlists = self.spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')
         correct_set = set()
-        correct_set.add('6zNdYuhJeOZYRTMiZ0T9DR')
-        correct_set.add('14FwYXlO5PH4dqaQYdomp6')
-        correct_set.add('37i9dQZF1Etq2nOAOxQGnV')
+        correct_set.add('spotify:playlist:6zNdYuhJeOZYRTMiZ0T9DR')
+        correct_set.add('spotify:playlist:14FwYXlO5PH4dqaQYdomp6')
+        correct_set.add('spotify:playlist:37i9dQZF1Etq2nOAOxQGnV')
 
         self.assertEqual(playlists, correct_set)
 

@@ -67,7 +67,7 @@ class SpotipyManager:
         """
         For a particular song, search all user playlists and return matched playlists
         :param song_uri: Unique ID of song on Spotify
-        :return: Set of Playlist IDs that song is found within
+        :return: Set of Playlist URIs that song is found within
         """
         found_playlist_ids = set()
 
@@ -88,11 +88,11 @@ class SpotipyManager:
         :param set_to_modify: Set that playlists are added to
         """
         for playlist in playlists['items']:
-            tracks = self.sp.playlist_tracks(playlist['id'])
+            tracks = self.sp.playlist_tracks(playlist['uri'])
 
             if is_track_in_tracks(song_uri, tracks):
-                set_to_modify.add(playlist['id'])
+                set_to_modify.add(playlist['uri'])
             while tracks['next']:
                 tracks = self.sp.next(tracks)
                 if is_track_in_tracks(song_uri, tracks):
-                    set_to_modify.add(playlist['id'])
+                    set_to_modify.add(playlist['uri'])
