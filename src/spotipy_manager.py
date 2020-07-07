@@ -46,7 +46,7 @@ class SpotipyManager:
         :param uri: Unique id of object
         :return: Name of object from uri
         """
-        if 'spotify:' in uri:
+        if 'spotify:' in uri:  # TODO Replace with regex
             # Format of uri is spotify
             uri_type = uri.split(':')[1]
             get_obj_from_id = getattr(self.sp, uri_type)

@@ -15,6 +15,19 @@ class TestSpotipyManager(unittest.TestCase):
         playlist = sp.playlist('spotify:playlist:37i9dQZF1DWYkaDif7Ztbp')  # African Heat Playlist
         self.assertFalse(is_track_in_tracks(song_uri, sp.playlist_tracks(playlist['id'])))
 
+    def test_get_name_from_uri(self):
+        self.assertEqual(self.spm.get_name_from_uri('spotify:track:5l08slmvFRUseHpq85neke'), 'NaNa', 'Track URI')
+        self.assertEqual(self.spm.get_name_from_uri('spotify:album:4nlIXR3GjNDLvuV2nrgpkX'), 'Back Again', 'Album URI')
+        self.assertEqual(self.spm.get_name_from_uri('spotify:playlist:37i9dQZF1DX3qCx5yEZkcJ'), 'Mellow Beats', 'Playlist URI')
+        self.assertEqual(self.spm.get_name_from_uri('spotify:artist:4GcpBLY8g8NrmimWbssM26'), 'Mndsgn', 'Artist URI')
+
+        with self.assertRaises(ValueError):
+            self.spm.get_name_from_uri('test_str')
+
+        with self.assertRaises(ValueError):
+            self.spm.get_name_from_uri('spotify')
+
+
     def test_find_song_in_playlists(self):
         playlists = self.spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')
         correct_set = set()
