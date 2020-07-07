@@ -55,14 +55,6 @@ class SpotipyManager:
         else:
             raise ValueError('uri string not in spotify uri format')
 
-    def get_playlist_name(self, playlist_id):
-        """
-        Gets name of a playlist from the id or uri
-        :param playlist_id: ID of playlist
-        :return: str Playlist Name
-        """
-        return self.sp.playlist(playlist_id)['name']
-
     def find_song_in_playlists(self, song_uri):
         """
         For a particular song, search all user playlists and return matched playlists

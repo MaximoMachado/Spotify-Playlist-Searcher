@@ -27,7 +27,6 @@ class TestSpotipyManager(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.spm.get_name_from_uri('spotify')
 
-
     def test_find_song_in_playlists(self):
         playlists = self.spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')
         correct_set = set()
