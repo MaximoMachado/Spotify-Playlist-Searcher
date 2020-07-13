@@ -1,3 +1,4 @@
+import re
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -41,18 +42,19 @@ class SpotipyManager:
 
     def get_name_from_uri(self, uri):
         """
-        Gets Name of Song/Album/Playlist from its uri
+        Gets Name of Song/Album/Playlist/Artist from its uri
         :param uri: Unique id of object
         :return: Name of object from uri
         """
-        if 'spotify:' in uri:  # TODO Replace with regex
+        matched_uri = re.search('spotify:(track|playlist|album|artist):.*', uri)
+        if matched_uri:
             # Format of uri is spotify:type:id
-            uri_type = uri.split(':')[1]
+            uri_type = matched_uri.group(1)
             get_obj_from_uri = getattr(self.sp, uri_type)
 
             return get_obj_from_uri(uri)['name']
         else:
-            raise ValueError('uri string not in spotify uri format')
+            raise ValueError('uri string not in spotify uri format or is uri of a user')
 
     def find_song_in_playlists(self, song_uri):
         """
