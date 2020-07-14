@@ -30,6 +30,7 @@ class Application(tk.Frame):
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
     def search_submit(self):
+        # TODO Bind function to enter key, either while in focus of search bar or anytime at all.
         search = self.search_bar.get()
         paging_object = self.spm.get_spotipy_client().search(search)
         tracks = paging_object['tracks']['items']
@@ -42,7 +43,7 @@ class Application(tk.Frame):
                 if not i == len(artists) - 1:
                     artists_str += ', '
 
-            self.search_results.insert(tk.END, f"{track['name']}    By: {artists_str}")
+            self.search_results.insert(tk.END, f"{track['name']}    -   {artists_str}")
 
 
 root = tk.Tk()
