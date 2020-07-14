@@ -8,7 +8,8 @@ class Application(tk.Frame):
         super().__init__(master)
         self.master = master
         self.main_frame = tk.Frame(master)
-        self.main_frame.grid(row=0, column=0, columnspan=2)
+        self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
+        self.spm = SpotipyManager()
         self.create_base_widgets()
 
     def create_base_widgets(self):
@@ -18,25 +19,15 @@ class Application(tk.Frame):
         self.settings_btn = tk.Button(self.main_frame, text="Settings")
         self.settings_btn.grid(row=0, column=1, sticky=tk.E)
 
-        if os.path.exists("./data/.cache-user"):
-            self.spm = SpotipyManager()
-            self.load_widgets()
-        else:
-            self.login_btn = tk.Button(self.main_frame, text="Login to Spotify", command=self.login_spotify)
-            self.login_btn.grid(row=1, column=0, columnspan=2)
-
-    def login_spotify(self):
-        self.spm = SpotipyManager()
-        self.load_widgets()
-        self.login_btn.grid_forget()
-
-    def load_widgets(self):
         self.search_bar = tk.Entry(self.main_frame, width=50)
         self.search_bar.grid(row=1, column=0)
         self.search_bar.focus()
 
         self.search_bar_submit = tk.Button(self.main_frame, text="Search for Song", command=self.search_submit)
         self.search_bar_submit.grid(row=1, column=1)
+
+        self.search_results = tk.Listbox(width=50)
+        self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
     def search_submit(self):
         search = self.search_bar.get()
