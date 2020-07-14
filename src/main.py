@@ -1,13 +1,20 @@
 from src.spotipy_manager import *
 import tkinter as tk
 
-# First make command line program, then expand to application
-# Allow choice of permissions to read private playlists or not
-# Function to format search query correctly and allow advanced searching
-# Figure out playlist formatting
-# Some songs don't have an id, if that happens resort to name matching
+root = tk.Tk()
+root.title('Spotify Playlist Searcher')
 
-main_window = tk.Tk()
+header = tk.Label(root, text="Spotify Playlist Searcher")
+header.grid(row=0, column=0, columnspan=2)
 
-main_window.mainloop()
+settings_btn = tk.Button(root, text="Settings")
+settings_btn.grid(row=0, column=1, sticky=tk.E)
+
+search_bar = tk.Entry(root, width=50)
+search_bar.grid(row=1, column=0, sticky=tk.W)
+
+search_bar_submit = tk.Button(root, text="Submit")
+search_bar.grid(row=1, column=1, sticky=tk.W)
+
+root.mainloop()
 
