@@ -30,6 +30,8 @@ class Application(tk.Frame):
 
     def search_submit(self):
         # TODO Bind function to enter key, either while in focus of search bar or anytime at all.
+        self.search_results.delete(0, tk.END)
+
         search = self.search_bar.get()
         paging_object = self.spm.get_spotipy_client().search(search)
         tracks = paging_object['tracks']['items']
