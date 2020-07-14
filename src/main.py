@@ -31,7 +31,10 @@ class Application(tk.Frame):
 
     def search_submit(self):
         search = self.search_bar.get()
-        print(self.spm.get_spotipy_client().search(search))
+        paging_object = self.spm.get_spotipy_client().search(search)
+        tracks = paging_object['tracks']['items']
+        for track in tracks:
+            self.search_results.insert(tk.END, track['name'])
 
 
 root = tk.Tk()
