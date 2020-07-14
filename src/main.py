@@ -8,18 +8,17 @@ def login_spotify():
     load_widgets()
     login_btn.grid_forget()
 
-
-def search_submit():
-    pass
-
-
 def load_widgets():
     search_bar = tk.Entry(root, width=50)
     search_bar.grid(row=1, column=0)
+    search_bar.focus()
 
     search_bar_submit = tk.Button(root, text="Search for Song", command=search_submit)
     search_bar_submit.grid(row=1, column=1)
 
+def search_submit():
+    search = search_bar.get()
+    print(spm.get_spotipy_client().search(search))
 
 root = tk.Tk()
 root.title('Spotify Playlist Searcher')
@@ -35,8 +34,8 @@ if os.path.exists("./data/.cache-user"):
     spm = SpotipyManager()
     load_widgets()
 else:
-    login_btn = tk.Button(root, text="Login to Spotify", command=login_spotify, width=50)
-    login_btn.grid(row=1, column=0)
+    login_btn = tk.Button(root, text="Login to Spotify", command=login_spotify)
+    login_btn.grid(row=1, column=0, columnspan=2)
 
 
 root.mainloop()
