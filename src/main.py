@@ -1,17 +1,53 @@
 from src.spotipy_manager import *
+import tkinter as tk
+import os.path
 
-# First make command line program, then expand to application
-# Allow choice of permissions to read private playlists or not
-# Function to format search query correctly and allow advanced searching
-# Figure out playlist formatting
-# Some songs don't have an id, if that happens resort to name matching
 
-if __name__ == '__main__':
+class Application(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.main_frame = tk.Frame(master)
+        self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
+        self.spm = SpotipyManager()
+        self.create_base_widgets()
 
-    spm = SpotipyManager()
+    def create_base_widgets(self):
+        self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
+        self.header.grid(row=0, column=0, columnspan=2, pady=10)
 
-    # Testing with song Melancolia by Caravan Palace
-    playlists = spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo')
-    print(playlists)
-    print([spm.get_name_from_uri(uri) for uri in playlists])
-    print(spm.get_name_from_uri('spotify:track:7CK2ioYuFmjRKHRhsop0Ww'))
+        self.settings_btn = tk.Button(self.main_frame, text="Settings")
+        self.settings_btn.grid(row=0, column=1, sticky=tk.E)
+
+        self.search_bar = tk.Entry(self.main_frame, width=50)
+        self.search_bar.grid(row=1, column=0)
+        self.search_bar.focus()
+
+        self.search_bar_submit = tk.Button(self.main_frame, text="Search for Song", command=self.search_submit)
+        self.search_bar_submit.grid(row=1, column=1)
+
+        self.search_results = tk.Listbox(width=50)
+        self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
+
+    def search_submit(self):
+        # TODO Bind function to enter key, either while in focus of search bar or anytime at all.
+        search = self.search_bar.get()
+        paging_object = self.spm.get_spotipy_client().search(search)
+        tracks = paging_object['tracks']['items']
+
+        for track in tracks:
+            artists = track['artists']
+            artists_str = ''
+            for i, artist in enumerate(artists):
+                artists_str += f'{artist["name"]}'
+                if not i == len(artists) - 1:
+                    artists_str += ', '
+
+            self.search_results.insert(tk.END, f"{track['name']}    -   {artists_str}")
+
+
+root = tk.Tk()
+root.title('Spotify Playlist Searcher')
+app = Application(master=root)
+app.mainloop()
+
