@@ -1,6 +1,6 @@
 from src.spotipy_manager import *
 import tkinter as tk
-import os
+import os.path
 
 class Application(tk.Frame):
     def __init__(self, master=None):
