@@ -33,8 +33,16 @@ class Application(tk.Frame):
         search = self.search_bar.get()
         paging_object = self.spm.get_spotipy_client().search(search)
         tracks = paging_object['tracks']['items']
+
         for track in tracks:
-            self.search_results.insert(tk.END, track['name'])
+            artists = track['artists']
+            artists_str = ''
+            for i, artist in enumerate(artists):
+                artists_str += f'{artist["name"]}'
+                if not i == len(artists) - 1:
+                    artists_str += ', '
+
+            self.search_results.insert(tk.END, f"{track['name']}    By: {artists_str}")
 
 
 root = tk.Tk()
