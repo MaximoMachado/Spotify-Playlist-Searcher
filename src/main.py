@@ -21,30 +21,36 @@ class Application(tk.Frame):
         self.search_bar = tk.Entry(self.main_frame, width=50)
         self.search_bar.grid(row=1, column=0)
         self.search_bar.focus()
+        self.search_bar.bind('<Return>', lambda x: self.search_submit())
 
         self.search_bar_submit = tk.Button(self.main_frame, text="Search for Song", command=self.search_submit)
         self.search_bar_submit.grid(row=1, column=1)
 
-        self.search_results = tk.Listbox(width=50)
+        self.search_results = tk.Listbox(self.main_frame, width=50)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
+        self.playlist_search_btn = tk.Button(self.main_frame, text="Search Playlists For Song", state=tk.DISABLED)
+        self.playlist_search_btn.grid(row=3, column=0, columnspan=2, pady=5)
+
     def search_submit(self):
-        # TODO Bind function to enter key, either while in focus of search bar or anytime at all.
         self.search_results.delete(0, tk.END)
 
         search = self.search_bar.get()
-        paging_object = self.spm.get_spotipy_client().search(search)
-        tracks = paging_object['tracks']['items']
+        if search:
+            paging_object = self.spm.get_spotipy_client().search(search)
+            tracks = paging_object['tracks']['items']
 
-        for track in tracks:
-            artists = track['artists']
-            artists_str = ''
-            for i, artist in enumerate(artists):
-                artists_str += f'{artist["name"]}'
-                if not i == len(artists) - 1:
-                    artists_str += ', '
+            for track in tracks:
+                artists = track['artists']
+                artists_str = ''
+                for i, artist in enumerate(artists):
+                    artists_str += f'{artist["name"]}'
+                    if not i == len(artists) - 1:
+                        artists_str += ', '
 
-            self.search_results.insert(tk.END, f"{track['name']}    -   {artists_str}")
+                self.search_results.insert(tk.END, f"{track['name']}    -   {artists_str}")
+
+
 
 
 root = tk.Tk()
