@@ -9,6 +9,7 @@ class Application(tk.Frame):
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
+
         self.create_base_widgets()
 
     def create_base_widgets(self):
@@ -53,7 +54,7 @@ class Application(tk.Frame):
                     if not i == len(artists) - 1:
                         artists_str += ', '
 
-                output_str = f"{track['name']}    -   {artists_str}"
+                output_str = f"{track['name']}    -    {artists_str}"
                 self.search_results.insert(tk.END, output_str)
                 self.song_dict[output_str] = track['uri']
 
@@ -64,7 +65,11 @@ class Application(tk.Frame):
             self.playlist_search_btn['state'] = tk.DISABLED
 
     def search_playlists(self):
-        pass
+        song_selected = self.search_results.selection_get()
+        song_uri = self.song_dict[song_selected]
+        playlist_uris = self.spm.find_song_in_playlists(song_uri)
+        playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
+        print(playlist_names)
 
 
 
