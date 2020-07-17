@@ -13,6 +13,10 @@ class Application(tk.Frame):
         self.create_base_widgets()
 
     def create_base_widgets(self):
+        # Defining shared widget settings
+        listbox_width = 50
+
+        # GUI widgets
         self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
         self.header.grid(row=0, column=0, columnspan=2, pady=10)
 
@@ -27,12 +31,16 @@ class Application(tk.Frame):
         self.search_bar_submit = tk.Button(self.main_frame, text="Search for Song", command=self.search_submit)
         self.search_bar_submit.grid(row=1, column=1)
 
-        self.search_results = tk.Listbox(self.main_frame, width=50)
+        # TODO Add 'Song Results:' to start of listbox and make it unselectable.
+        self.search_results = tk.Listbox(self.main_frame, width=listbox_width)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
 
         self.playlist_search_btn = tk.Button(self.main_frame, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
         self.playlist_search_btn.grid(row=3, column=0, columnspan=2, pady=5)
+
+        # Will be displayed at later point
+        self.playlist_results = tk.Listbox(self.main_frame, width=listbox_width)
 
     def search_submit(self):
         # Disables playlist button and clears search results
@@ -65,11 +73,21 @@ class Application(tk.Frame):
             self.playlist_search_btn['state'] = tk.DISABLED
 
     def search_playlists(self):
+
         song_selected = self.search_results.selection_get()
         song_uri = self.song_dict[song_selected]
         playlist_uris = self.spm.find_song_in_playlists(song_uri)
         playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
-        print(playlist_names)
+
+        # Displaying playlist listbox and then inserting playlists
+        self.playlist_results.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
+        self.playlist_results.delete(0, tk.END)
+        if playlist_names:
+            for name in playlist_names:
+                self.playlist_results.insert(tk.END, name)
+        else:
+            self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
+
 
 
 

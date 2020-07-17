@@ -62,6 +62,7 @@ class SpotipyManager:
         :param song_uri: Unique ID of song on Spotify
         :return: Set of Playlist URIs that song is found within
         """
+        # TODO Allow parameter for playlists to ignore
         found_playlist_ids = set()
 
         playlists = self.sp.current_user_playlists()
