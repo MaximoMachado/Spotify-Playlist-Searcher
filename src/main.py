@@ -23,25 +23,37 @@ class Application(tk.Frame):
         self.settings_btn = tk.Button(self.main_frame, text="Settings")
         self.settings_btn.grid(row=0, column=1, sticky=tk.E)
 
-        self.search_bar = tk.Entry(self.main_frame, width=50)
-        self.search_bar.grid(row=1, column=0)
+        # Song Search
+        self.song_search = tk.Frame(self.main_frame)
+        self.song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
+
+        self.search_bar = tk.Entry(self.song_search, width=50)
+        self.search_bar.grid(row=0, column=0)
         self.search_bar.focus()
         self.search_bar.bind('<Return>', lambda x: self.search_submit())
 
-        self.search_bar_submit = tk.Button(self.main_frame, text="Search for Song", command=self.search_submit)
-        self.search_bar_submit.grid(row=1, column=1)
+        self.search_bar_submit = tk.Button(self.song_search, text="Search for Song", command=self.search_submit)
+        self.search_bar_submit.grid(row=0, column=1)
+
+        self.search_results_label = tk.Label(self.song_search, text='Song Results')
+        self.search_results_label.grid(row=1, column=0, columnspan=2)
 
         # TODO Add 'Song Results:' to start of listbox and make it unselectable.
-        self.search_results = tk.Listbox(self.main_frame, width=listbox_width)
+        self.search_results = tk.Listbox(self.song_search, width=listbox_width)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
 
-        self.playlist_search_btn = tk.Button(self.main_frame, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
-        self.playlist_search_btn.grid(row=3, column=0, columnspan=2, pady=5)
+        # Playlist Search
+        self.playlist_search = tk.Frame(self.main_frame)
+        self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3)
+
+        self.playlist_search_btn = tk.Button(self.playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
+        self.playlist_search_btn.grid(row=0, column=0, columnspan=2, pady=5)
 
         # Will be displayed at later point
-        self.playlist_results = tk.Listbox(self.main_frame, width=listbox_width)
+        self.playlist_label = tk.Label(self.playlist_search, text='Playlists Song is Within')
+        self.playlist_results = tk.Listbox(self.playlist_search, width=listbox_width)
 
     def search_submit(self):
         # Disables playlist button and clears search results
@@ -74,14 +86,19 @@ class Application(tk.Frame):
             self.playlist_search_btn['state'] = tk.DISABLED
 
     def search_playlists(self):
+        # If nothing is selected, selection_get() throws an error
+        try:
+            song_selected = self.search_results.selection_get()
+        except:
+            return
 
-        song_selected = self.search_results.selection_get()
         song_uri = self.song_dict[song_selected]
         playlist_uris = self.spm.find_song_in_playlists(song_uri)
         playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
         # Displaying playlist listbox and then inserting playlists
-        self.playlist_results.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
+        self.playlist_label.grid(row=1, column=0, columnspan=2)
+        self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.playlist_results.delete(0, tk.END)
         if playlist_names:
             for name in playlist_names:
