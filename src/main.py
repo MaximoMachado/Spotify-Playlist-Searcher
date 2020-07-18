@@ -3,6 +3,7 @@ import tkinter as tk
 
 
 class Application(tk.Frame):
+    # TODO Documentation
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -13,10 +14,6 @@ class Application(tk.Frame):
         self.create_base_widgets()
 
     def create_base_widgets(self):
-        # TODO Separate each frame into own function
-        # Defining shared widget settings
-        listbox_width = 50
-
         # GUI widgets
         self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
         self.header.grid(row=0, column=0, columnspan=2, pady=10)
@@ -25,6 +22,12 @@ class Application(tk.Frame):
         self.settings_btn.grid(row=0, column=1, sticky=tk.E)
 
         # Song Search
+        self.create_song_widgets()
+
+        # Playlist Search
+        self.create_playlist_widgets()
+
+    def create_song_widgets(self):
         self.song_search = tk.Frame(self.main_frame)
         self.song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
 
@@ -39,13 +42,12 @@ class Application(tk.Frame):
         self.search_results_label = tk.Label(self.song_search, text='Song Results')
         self.search_results_label.grid(row=1, column=0, columnspan=2)
 
-        # TODO Add 'Song Results:' to start of listbox and make it unselectable.
-        self.search_results = tk.Listbox(self.song_search, width=listbox_width)
+        self.search_results = tk.Listbox(self.song_search, width=50)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
 
-        # Playlist Search
+    def create_playlist_widgets(self):
         self.playlist_search = tk.Frame(self.main_frame)
         self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
 
@@ -54,7 +56,7 @@ class Application(tk.Frame):
 
         # Will be displayed at later point
         self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
-        self.playlist_results = tk.Listbox(self.playlist_search, width=listbox_width)
+        self.playlist_results = tk.Listbox(self.playlist_search, width=50)
 
     def search_submit(self):
         # Disables playlist button and clears search results
@@ -106,9 +108,6 @@ class Application(tk.Frame):
                 self.playlist_results.insert(tk.END, name)
         else:
             self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
-
-
-
 
 
 root = tk.Tk()
