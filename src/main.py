@@ -35,6 +35,7 @@ class Application(tk.Frame):
         self.search_results = tk.Listbox(self.main_frame, width=listbox_width)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
+        self.search_results.bind('<Return>', lambda x: self.search_playlists())
 
         self.playlist_search_btn = tk.Button(self.main_frame, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
         self.playlist_search_btn.grid(row=3, column=0, columnspan=2, pady=5)
