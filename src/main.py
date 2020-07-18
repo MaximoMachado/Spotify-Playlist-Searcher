@@ -13,6 +13,7 @@ class Application(tk.Frame):
         self.create_base_widgets()
 
     def create_base_widgets(self):
+        # TODO Separate each frame into own function
         # Defining shared widget settings
         listbox_width = 50
 
@@ -40,19 +41,19 @@ class Application(tk.Frame):
 
         # TODO Add 'Song Results:' to start of listbox and make it unselectable.
         self.search_results = tk.Listbox(self.song_search, width=listbox_width)
-        self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
+        self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
 
         # Playlist Search
         self.playlist_search = tk.Frame(self.main_frame)
-        self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3)
+        self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
 
         self.playlist_search_btn = tk.Button(self.playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
         self.playlist_search_btn.grid(row=0, column=0, columnspan=2, pady=5)
 
         # Will be displayed at later point
-        self.playlist_label = tk.Label(self.playlist_search, text='Playlists Song is Within')
+        self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(self.playlist_search, width=listbox_width)
 
     def search_submit(self):
@@ -97,8 +98,8 @@ class Application(tk.Frame):
         playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
         # Displaying playlist listbox and then inserting playlists
-        self.playlist_label.grid(row=1, column=0, columnspan=2)
-        self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
+        self.playlist_label.grid(row=1, column=0, columnspan=2, pady=(10, 5))
+        self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5)
         self.playlist_results.delete(0, tk.END)
         if playlist_names:
             for name in playlist_names:
