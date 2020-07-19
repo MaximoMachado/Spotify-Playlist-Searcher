@@ -3,7 +3,6 @@ import tkinter as tk
 
 
 class Application(tk.Frame):
-    # TODO Documentation
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -14,6 +13,9 @@ class Application(tk.Frame):
         self.create_base_widgets()
 
     def create_base_widgets(self):
+        """
+        Initialises all widgets and puts onto the grid the widgets that appear at the start of the application.
+        """
         # GUI widgets
         self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
         self.header.grid(row=0, column=0, columnspan=2, pady=10)
@@ -28,6 +30,9 @@ class Application(tk.Frame):
         self.create_playlist_widgets()
 
     def create_song_widgets(self):
+        """
+        Initialises widgets related to searching for songs on Spotify
+        """
         self.song_search = tk.Frame(self.main_frame)
         self.song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
 
@@ -48,6 +53,9 @@ class Application(tk.Frame):
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
 
     def create_playlist_widgets(self):
+        """
+        Initialises widgets related to searching through playlists for a song. Does not display the playlist results listbox and label.
+        """
         self.playlist_search = tk.Frame(self.main_frame)
         self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
 
@@ -59,6 +67,9 @@ class Application(tk.Frame):
         self.playlist_results = tk.Listbox(self.playlist_search, width=50)
 
     def search_submit(self):
+        """
+        Takes search entered and displays the songs in the listbox. Also, initialises a dict mapping the song names to their Spotify uri.
+        """
         # Disables playlist button and clears search results
         self.search_results.delete(0, tk.END)
         self.playlist_search_btn['state'] = tk.DISABLED
@@ -83,12 +94,18 @@ class Application(tk.Frame):
                 self.song_dict[output_str] = track['uri']
 
     def check_song_selection(self):
+        """
+        If a song has been selected in the song listbox, then the button to search through the playlists can be pressed.
+        """
         if self.search_results.curselection():
             self.playlist_search_btn['state'] = tk.NORMAL
         else:
             self.playlist_search_btn['state'] = tk.DISABLED
 
     def search_playlists(self):
+        """
+        Searches through the playlists for the selected song and displays the results in a new listbox.
+        """
         # If nothing is selected, selection_get() throws an error
         try:
             song_selected = self.search_results.selection_get()
