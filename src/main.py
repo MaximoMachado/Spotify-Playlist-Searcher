@@ -70,9 +70,37 @@ class Application(tk.Frame):
 
     def create_settings_widgets(self):
         self.settings_window = tk.Toplevel(self.master)
+        self.settings_window.title('Settings')
 
         self.settings_frame = tk.Frame(self.settings_window)
         self.settings_frame.grid(row=0, column=0)
+
+        self.settings_header = tk.Label(self.settings_frame, text='Settings')
+        self.settings_header.grid(row=0, column=0, columnspan=2)
+
+        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
+        self.region_label.grid(row=1, column=0)
+
+        self.cache_toggle = tk.Checkbutton(self.settings_frame, text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
+        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
+
+        self.threading_toggle = tk.Checkbutton(self.settings_frame, text='Enable Threading (Prevents hangup but slows down search)')
+        self.threading_toggle.grid(row=2, column=0, sticky=tk.W)
+
+        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
+        self.playlist_options_frame.grid(row=3, column=0, columnspan=2)
+
+        self.playlist_options = []
+
+        playlists = self.spm.get_spotipy_client().current_user_playlists()
+        for i, playlist in enumerate(playlists['items']):
+            playlist_name = f'{playlist["name"]}'
+            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name)
+            option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
+            self.playlist_options.append(option)
+
+
+
 
     def search_submit(self):
         """
@@ -114,7 +142,7 @@ class Application(tk.Frame):
         """
         Searches through the playlists for the selected song and displays the results in a new listbox.
         """
-        def threaded_search(self):
+        def threaded_search():
             # If nothing is selected, selection_get() throws an error
             try:
                 song_selected = self.search_results.selection_get()
@@ -130,12 +158,13 @@ class Application(tk.Frame):
             self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5)
             self.playlist_results.delete(0, tk.END)
             if playlist_names:
+                playlist_names.sort()
                 for name in playlist_names:
                     self.playlist_results.insert(tk.END, name)
             else:
                 self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
 
-        thread = threading.Thread(target=lambda: threaded_search(self))
+        thread = threading.Thread(target=lambda: threaded_search())
         thread.start()
 
 
