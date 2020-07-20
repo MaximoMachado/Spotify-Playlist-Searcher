@@ -1,5 +1,6 @@
 from src.spotipy_manager import *
 import tkinter as tk
+import threading
 
 
 class Application(tk.Frame):
@@ -39,6 +40,7 @@ class Application(tk.Frame):
         self.search_bar = tk.Entry(self.song_search, width=50)
         self.search_bar.grid(row=0, column=0)
         self.search_bar.focus()
+        # Lambda expression is necessary because of self arg
         self.search_bar.bind('<Return>', lambda x: self.search_submit())
 
         self.search_bar_submit = tk.Button(self.song_search, text="Search for Song", command=self.search_submit)
@@ -106,25 +108,29 @@ class Application(tk.Frame):
         """
         Searches through the playlists for the selected song and displays the results in a new listbox.
         """
-        # If nothing is selected, selection_get() throws an error
-        try:
-            song_selected = self.search_results.selection_get()
-        except:
-            return
+        def threaded_search(self):
+            # If nothing is selected, selection_get() throws an error
+            try:
+                song_selected = self.search_results.selection_get()
+            except:
+                return
+            print('Entered')
+            song_uri = self.song_dict[song_selected]
+            playlist_uris = self.spm.find_song_in_playlists(song_uri)
+            playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
-        song_uri = self.song_dict[song_selected]
-        playlist_uris = self.spm.find_song_in_playlists(song_uri)
-        playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
+            # Displaying playlist listbox and then inserting playlists
+            self.playlist_label.grid(row=1, column=0, columnspan=2, pady=(10, 5))
+            self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5)
+            self.playlist_results.delete(0, tk.END)
+            if playlist_names:
+                for name in playlist_names:
+                    self.playlist_results.insert(tk.END, name)
+            else:
+                self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
 
-        # Displaying playlist listbox and then inserting playlists
-        self.playlist_label.grid(row=1, column=0, columnspan=2, pady=(10, 5))
-        self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5)
-        self.playlist_results.delete(0, tk.END)
-        if playlist_names:
-            for name in playlist_names:
-                self.playlist_results.insert(tk.END, name)
-        else:
-            self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
+        thread = threading.Thread(target=lambda: threaded_search(self))
+        thread.start()
 
 
 root = tk.Tk()
