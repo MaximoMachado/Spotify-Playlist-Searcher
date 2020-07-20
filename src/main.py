@@ -21,7 +21,7 @@ class Application(tk.Frame):
         self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
         self.header.grid(row=0, column=0, columnspan=2, pady=10)
 
-        self.settings_btn = tk.Button(self.main_frame, text="Settings")
+        self.settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
         self.settings_btn.grid(row=0, column=1, sticky=tk.E)
 
         # Song Search
@@ -67,6 +67,12 @@ class Application(tk.Frame):
         # Will be displayed at later point
         self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(self.playlist_search, width=50)
+
+    def create_settings_widgets(self):
+        self.settings_window = tk.Toplevel(self.master)
+
+        self.settings_frame = tk.Frame(self.settings_window)
+        self.settings_frame.grid(row=0, column=0)
 
     def search_submit(self):
         """
@@ -114,7 +120,7 @@ class Application(tk.Frame):
                 song_selected = self.search_results.selection_get()
             except:
                 return
-            print('Entered')
+
             song_uri = self.song_dict[song_selected]
             playlist_uris = self.spm.find_song_in_playlists(song_uri)
             playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
