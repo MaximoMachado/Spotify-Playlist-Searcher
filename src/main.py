@@ -10,6 +10,7 @@ class Application(tk.Frame):
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
+        self.settings = {'threading': False, 'playlists_exclude': []}
 
         self.create_base_widgets()
 
@@ -67,40 +68,6 @@ class Application(tk.Frame):
         # Will be displayed at later point
         self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(self.playlist_search, width=50)
-
-    def create_settings_widgets(self):
-        self.settings_window = tk.Toplevel(self.master)
-        self.settings_window.title('Settings')
-
-        self.settings_frame = tk.Frame(self.settings_window)
-        self.settings_frame.grid(row=0, column=0)
-
-        self.settings_header = tk.Label(self.settings_frame, text='Settings')
-        self.settings_header.grid(row=0, column=0, columnspan=2)
-
-        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
-        self.region_label.grid(row=1, column=0)
-
-        self.cache_toggle = tk.Checkbutton(self.settings_frame, text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
-        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
-
-        self.threading_toggle = tk.Checkbutton(self.settings_frame, text='Enable Threading (Prevents hangup but slows down search)')
-        self.threading_toggle.grid(row=2, column=0, sticky=tk.W)
-
-        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
-        self.playlist_options_frame.grid(row=3, column=0, columnspan=2)
-
-        self.playlist_options = []
-
-        playlists = self.spm.get_spotipy_client().current_user_playlists()
-        for i, playlist in enumerate(playlists['items']):
-            playlist_name = f'{playlist["name"]}'
-            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name)
-            option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
-            self.playlist_options.append(option)
-
-
-
 
     def search_submit(self):
         """
@@ -167,6 +134,39 @@ class Application(tk.Frame):
         thread = threading.Thread(target=lambda: threaded_search())
         thread.start()
 
+    def create_settings_widgets(self):
+        self.settings_window = tk.Toplevel(self.master)
+        self.settings_window.title('Settings')
+
+        self.settings_frame = tk.Frame(self.settings_window)
+        self.settings_frame.grid(row=0, column=0)
+
+        self.settings_header = tk.Label(self.settings_frame, text='Settings')
+        self.settings_header.grid(row=0, column=0, columnspan=2)
+
+        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
+        self.region_label.grid(row=1, column=0)
+
+        cache_val = tk.BooleanVar()
+        self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=cache_val,
+                                           text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
+        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
+
+        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
+        self.playlist_options_frame.grid(row=3, column=0, columnspan=2)
+
+        playlists = self.spm.get_spotipy_client().current_user_playlists()
+        self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
+        for i, playlist in enumerate(playlists['items']):
+            playlist_name = f'{playlist["name"]}'
+
+            check_val = tk.BooleanVar()
+            self.check_vals.append((check_val, f'{playlist["uri"]}'))
+            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0], command=lambda: self.print_val())
+            option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
+
+    def print_val(self):
+        print([val[0].get() for val in self.check_vals])
 
 root = tk.Tk()
 root.title('Spotify Playlist Searcher')
