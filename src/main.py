@@ -1,17 +1,38 @@
 from src.spotipy_manager import *
 import tkinter as tk
 import threading
+import json
 
 
 class Application(tk.Frame):
+    # TODO Refactor so that not all variables utilize self
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
+        self.master.protocol("WM_DELETE_WINDOW", self.save_and_exit)
+
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
 
+        # Set default settings
+        self.settings = {'cache': True, 'playlists_exclude': []}
+        # Load settings from file
+        try:
+            with open('./data/settings.json', 'r') as file:
+                self.settings = json.loads(file.read())
+        except FileNotFoundError:
+            pass
+
         self.create_base_widgets()
+
+    def save_and_exit(self):
+        """
+        Saves self.settings to a file and exits
+        """
+        with open('./data/settings.json', 'w+') as file:
+            file.write(json.dumps(self.settings, indent=1))
+        self.master.destroy()
 
     def create_base_widgets(self):
         """
@@ -21,7 +42,7 @@ class Application(tk.Frame):
         self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
         self.header.grid(row=0, column=0, columnspan=2, pady=10)
 
-        self.settings_btn = tk.Button(self.main_frame, text="Settings")
+        self.settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
         self.settings_btn.grid(row=0, column=1, sticky=tk.E)
 
         # Song Search
@@ -108,15 +129,15 @@ class Application(tk.Frame):
         """
         Searches through the playlists for the selected song and displays the results in a new listbox.
         """
-        def threaded_search(self):
+        def threaded_search():
             # If nothing is selected, selection_get() throws an error
             try:
                 song_selected = self.search_results.selection_get()
             except:
                 return
-            print('Entered')
+
             song_uri = self.song_dict[song_selected]
-            playlist_uris = self.spm.find_song_in_playlists(song_uri)
+            playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
             playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
             # Displaying playlist listbox and then inserting playlists
@@ -124,17 +145,92 @@ class Application(tk.Frame):
             self.playlist_results.grid(row=2, column=0, columnspan=2, padx=5)
             self.playlist_results.delete(0, tk.END)
             if playlist_names:
+                playlist_names.sort()
                 for name in playlist_names:
                     self.playlist_results.insert(tk.END, name)
             else:
                 self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
 
-        thread = threading.Thread(target=lambda: threaded_search(self))
+        thread = threading.Thread(target=lambda: threaded_search())
         thread.start()
 
+    def create_settings_widgets(self):
+        """
+        Creates a new window for settings related to the application
+        """
+        self.settings_window = tk.Toplevel(self.master)
+        self.settings_window.title('Settings')
+        self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
 
-root = tk.Tk()
-root.title('Spotify Playlist Searcher')
-app = Application(master=root)
-app.mainloop()
+        self.settings_frame = tk.Frame(self.settings_window)
+        self.settings_frame.grid(row=0, column=0)
+
+        self.settings_header = tk.Label(self.settings_frame, text='Settings')
+        self.settings_header.grid(row=0, column=0, columnspan=2)
+
+        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
+        self.region_label.grid(row=1, column=0)
+
+        # TODO Implement caching
+        self.cache_val = tk.BooleanVar()
+        self.cache_val.set(self.settings['cache'])
+        self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=self.cache_val,
+                                           text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
+        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
+
+        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
+        self.playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
+
+        self.options_toggle_val = tk.BooleanVar()
+        self.options_toggle_val.set(True)
+        playlist_options_toggle = tk.Checkbutton(self.playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
+        playlist_options_toggle.grid(row=0, column=0, columnspan=2, sticky=tk.W)
+
+        # TODO Add scrollbar if too many playlist options
+        playlists = self.spm.get_spotipy_client().current_user_playlists()
+        self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
+        # Generates checkboxes for each user playlist
+        for i, playlist in enumerate(playlists['items']):
+            playlist_name = f'{playlist["name"]}'
+
+            check_val = tk.BooleanVar()
+            if playlist['uri'] in self.settings['playlists_exclude']:
+                check_val.set(False)
+            else:
+                check_val.set(True)
+            self.check_vals.append((check_val, playlist["uri"]))
+            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
+            option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
+
+        reset_btn = tk.Button(self.settings_frame, text='Reset Settings', command=self.reset_settings)
+        reset_btn.grid(row=4, column=0, columnspan=2, pady=(0, 10))
+
+    def exit_settings(self):
+        """
+        Saves settings to self.settings before exiting.
+        """
+        self.settings['cache'] = self.cache_val.get()
+        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.check_vals if not check_val[0].get()]
+        self.settings_window.destroy()
+
+    def reset_settings(self):
+        """
+        Resets settings to default values.
+        """
+        self.settings = {'cache': True, 'playlists_exclude': []}
+        self.cache_val.set(True)
+        for val in self.check_vals:
+            val[0].set(True)
+
+    def playlists_toggle(self):
+        toggle_val = self.options_toggle_val.get()
+        for check_val in self.check_vals:
+            check_val[0].set(toggle_val)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.title('Spotify Playlist Searcher')
+    app = Application(master=root)
+    app.mainloop()
 

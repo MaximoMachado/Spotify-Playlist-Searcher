@@ -1,4 +1,5 @@
 /.idea/
 /venv/
 **/.cache*
+**/settings.json
 __pycache__
