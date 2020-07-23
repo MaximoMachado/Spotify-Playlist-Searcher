@@ -10,7 +10,7 @@ class Application(tk.Frame):
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
-        self.settings = {'cache': False, 'playlists_exclude': ()}
+        self.settings = {'cache': False, 'playlists_exclude': []}
 
         self.create_base_widgets()
 
@@ -149,6 +149,7 @@ class Application(tk.Frame):
         self.region_label.grid(row=1, column=0)
 
         self.cache_val = tk.BooleanVar()
+        self.cache_val.set(self.settings['cache'])
         self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=self.cache_val,
                                            text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
         self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
@@ -162,7 +163,11 @@ class Application(tk.Frame):
             playlist_name = f'{playlist["name"]}'
 
             check_val = tk.BooleanVar()
-            self.check_vals.append((check_val, f'{playlist["uri"]}'))
+            if playlist['uri'] in self.settings['playlists_exclude']:
+                check_val.set(False)
+            else:
+                check_val.set(True)
+            self.check_vals.append((check_val, playlist["uri"]))
             option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
             option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
 
@@ -171,8 +176,7 @@ class Application(tk.Frame):
         Saves settings to self.settings before exiting.
         """
         self.settings['cache'] = self.cache_val.get()
-        self.settings['playlists_exclude'] = (check_val[1] for check_val in self.check_vals if check_val[0].get())
-        print(self.settings)
+        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.check_vals if not check_val[0].get()]
         self.settings_window.destroy()
 
 
