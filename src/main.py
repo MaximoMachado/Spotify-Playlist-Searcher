@@ -158,7 +158,6 @@ class Application(tk.Frame):
         """
         Creates a new window for settings related to the application
         """
-        # TODO Add option to reset settings
         self.settings_window = tk.Toplevel(self.master)
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
@@ -179,10 +178,15 @@ class Application(tk.Frame):
                                            text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
         self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
 
-        # TODO Provide option to toggle all or none of playlists
         self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
         self.playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
+        self.options_toggle_val = tk.BooleanVar()
+        self.options_toggle_val.set(True)
+        playlist_options_toggle = tk.Checkbutton(self.playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
+        playlist_options_toggle.grid(row=0, column=0, columnspan=2, sticky=tk.W)
+
+        # TODO Add scrollbar if too many playlist options
         playlists = self.spm.get_spotipy_client().current_user_playlists()
         self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
         # Generates checkboxes for each user playlist
@@ -196,7 +200,7 @@ class Application(tk.Frame):
                 check_val.set(True)
             self.check_vals.append((check_val, playlist["uri"]))
             option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
-            option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
+            option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
 
         reset_btn = tk.Button(self.settings_frame, text='Reset Settings', command=self.reset_settings)
         reset_btn.grid(row=4, column=0, columnspan=2, pady=(0, 10))
@@ -217,6 +221,11 @@ class Application(tk.Frame):
         self.cache_val.set(True)
         for val in self.check_vals:
             val[0].set(True)
+
+    def playlists_toggle(self):
+        toggle_val = self.options_toggle_val.get()
+        for check_val in self.check_vals:
+            check_val[0].set(toggle_val)
 
 
 if __name__ == '__main__':
