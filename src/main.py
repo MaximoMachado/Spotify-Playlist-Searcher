@@ -4,15 +4,24 @@ import threading
 
 
 class Application(tk.Frame):
+    # TODO Refactor so that not all variables utilize self
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
+        self.master.protocol("WM_DELETE_WINDOW", self.save_and_exit)
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
         self.settings = {'cache': False, 'playlists_exclude': []}
 
         self.create_base_widgets()
+
+    def save_and_exit(self):
+        """
+        Saves self.settings to a file and exits
+        """
+        
+        self.master.destroy()
 
     def create_base_widgets(self):
         """
@@ -135,6 +144,9 @@ class Application(tk.Frame):
         thread.start()
 
     def create_settings_widgets(self):
+        """
+        Creates a new window for settings related to the application
+        """
         self.settings_window = tk.Toplevel(self.master)
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
