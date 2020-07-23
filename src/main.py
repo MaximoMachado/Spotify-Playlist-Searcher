@@ -1,6 +1,7 @@
 from src.spotipy_manager import *
 import tkinter as tk
 import threading
+import json
 
 
 class Application(tk.Frame):
@@ -12,7 +13,14 @@ class Application(tk.Frame):
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
+
+        # Load settings from file
         self.settings = {'cache': False, 'playlists_exclude': []}
+        try:
+            with open('./data/settings.json', 'r') as file:
+                self.settings = json.loads(file.read())
+        except FileNotFoundError:
+            pass
 
         self.create_base_widgets()
 
@@ -20,7 +28,8 @@ class Application(tk.Frame):
         """
         Saves self.settings to a file and exits
         """
-        
+        with open('./data/settings.json', 'w+') as file:
+            file.write(json.dumps(self.settings, indent=1))
         self.master.destroy()
 
     def create_base_widgets(self):
