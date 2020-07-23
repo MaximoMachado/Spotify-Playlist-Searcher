@@ -135,7 +135,7 @@ class Application(tk.Frame):
                 return
 
             song_uri = self.song_dict[song_selected]
-            playlist_uris = self.spm.find_song_in_playlists(song_uri)
+            playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
             playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
             # Displaying playlist listbox and then inserting playlists
@@ -156,6 +156,7 @@ class Application(tk.Frame):
         """
         Creates a new window for settings related to the application
         """
+        # TODO Add option to reset settings
         self.settings_window = tk.Toplevel(self.master)
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
@@ -175,6 +176,7 @@ class Application(tk.Frame):
                                            text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
         self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
 
+        # TODO Provide option to toggle all or none of playlists
         self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
         self.playlist_options_frame.grid(row=3, column=0, columnspan=2)
 
