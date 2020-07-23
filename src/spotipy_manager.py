@@ -56,37 +56,39 @@ class SpotipyManager:
         else:
             raise ValueError('uri string not in spotify uri format or is uri of a user')
 
-    def find_song_in_playlists(self, song_uri):
+    def find_song_in_playlists(self, song_uri, playlists_to_exclude=()):
         """
         For a particular song, search all user playlists and return matched playlists
         :param song_uri: Unique ID of song on Spotify
+        :param playlists_to_exclude: Set of playlist uri's to not search through
         :return: Set of Playlist URIs that song is found within
         """
-        # TODO Allow parameter for playlists to ignore
         found_playlist_ids = set()
 
         playlists = self.sp.current_user_playlists()
 
-        self._find_song_helper(song_uri, playlists, found_playlist_ids)
+        self._find_song_helper(song_uri, playlists, found_playlist_ids, playlists_to_exclude)
         while playlists['next']:
             playlists = self.sp.next(playlists)
-            self._find_song_helper(song_uri, playlists, found_playlist_ids)
+            self._find_song_helper(song_uri, playlists, found_playlist_ids, playlists_to_exclude)
 
         return found_playlist_ids
 
-    def _find_song_helper(self, song_uri, playlists, set_to_modify):
+    def _find_song_helper(self, song_uri, playlists, set_to_modify, playlists_to_exclude):
         """
         Adds to a set playlists that contain the song specified
         :param song_uri: Unique ID of song on Spotify to find
         :param playlists: Page Object of Playlists to search through
         :param set_to_modify: Set that playlists are added to
+        :param playlists_to_exclude: Set of playlist uri's to not search through
         """
         for playlist in playlists['items']:
-            tracks = self.sp.playlist_tracks(playlist['uri'])
+            if playlist['uri'] not in playlists_to_exclude:
+                tracks = self.sp.playlist_tracks(playlist['uri'])
 
-            if is_track_in_tracks(song_uri, tracks):
-                set_to_modify.add(playlist['uri'])
-            while tracks['next']:
-                tracks = self.sp.next(tracks)
                 if is_track_in_tracks(song_uri, tracks):
                     set_to_modify.add(playlist['uri'])
+                while tracks['next']:
+                    tracks = self.sp.next(tracks)
+                    if is_track_in_tracks(song_uri, tracks):
+                        set_to_modify.add(playlist['uri'])

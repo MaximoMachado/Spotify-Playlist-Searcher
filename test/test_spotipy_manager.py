@@ -36,6 +36,12 @@ class TestSpotipyManager(unittest.TestCase):
 
         self.assertEqual(playlists, correct_set)
 
+        playlists = self.spm.find_song_in_playlists('spotify:track:0K8ML5cB3rGmNe1oOVTXPo', playlists_to_exclude=('spotify:playlist:6zNdYuhJeOZYRTMiZ0T9DR', 'spotify:playlist:14FwYXlO5PH4dqaQYdomp6'))
+        correct_set = set()
+        correct_set.add('spotify:playlist:37i9dQZF1Etq2nOAOxQGnV')
+
+        self.assertEqual(playlists, correct_set)
+
 
 if __name__ == '__main__':
     unittest.main()
