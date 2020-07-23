@@ -223,6 +223,9 @@ class Application(tk.Frame):
             val[0].set(True)
 
     def playlists_toggle(self):
+        """
+        Toggles all of the playlist checkboxes on or off
+        """
         toggle_val = self.options_toggle_val.get()
         for check_val in self.check_vals:
             check_val[0].set(toggle_val)
