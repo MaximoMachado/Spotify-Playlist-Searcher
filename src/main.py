@@ -10,12 +10,14 @@ class Application(tk.Frame):
         super().__init__(master)
         self.master = master
         self.master.protocol("WM_DELETE_WINDOW", self.save_and_exit)
+
         self.main_frame = tk.Frame(master)
         self.main_frame.grid(row=0, column=0, columnspan=2, padx=10)
         self.spm = SpotipyManager()
 
+        # Set default settings
+        self.settings = {'cache': True, 'playlists_exclude': []}
         # Load settings from file
-        self.settings = {'cache': False, 'playlists_exclude': []}
         try:
             with open('./data/settings.json', 'r') as file:
                 self.settings = json.loads(file.read())
@@ -170,6 +172,7 @@ class Application(tk.Frame):
         self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
         self.region_label.grid(row=1, column=0)
 
+        # TODO Implement caching
         self.cache_val = tk.BooleanVar()
         self.cache_val.set(self.settings['cache'])
         self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=self.cache_val,
@@ -178,10 +181,11 @@ class Application(tk.Frame):
 
         # TODO Provide option to toggle all or none of playlists
         self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
-        self.playlist_options_frame.grid(row=3, column=0, columnspan=2)
+        self.playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
         playlists = self.spm.get_spotipy_client().current_user_playlists()
         self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
+        # Generates checkboxes for each user playlist
         for i, playlist in enumerate(playlists['items']):
             playlist_name = f'{playlist["name"]}'
 
@@ -194,6 +198,9 @@ class Application(tk.Frame):
             option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
             option.grid(row=i, column=0, columnspan=2, sticky=tk.W)
 
+        reset_btn = tk.Button(self.settings_frame, text='Reset Settings', command=self.reset_settings)
+        reset_btn.grid(row=4, column=0, columnspan=2, pady=(0, 10))
+
     def exit_settings(self):
         """
         Saves settings to self.settings before exiting.
@@ -201,6 +208,15 @@ class Application(tk.Frame):
         self.settings['cache'] = self.cache_val.get()
         self.settings['playlists_exclude'] = [check_val[1] for check_val in self.check_vals if not check_val[0].get()]
         self.settings_window.destroy()
+
+    def reset_settings(self):
+        """
+        Resets settings to default values.
+        """
+        self.settings = {'cache': True, 'playlists_exclude': []}
+        self.cache_val.set(True)
+        for val in self.check_vals:
+            val[0].set(True)
 
 
 if __name__ == '__main__':
