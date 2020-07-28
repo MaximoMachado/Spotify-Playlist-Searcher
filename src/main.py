@@ -168,10 +168,6 @@ class Application(tk.Frame):
         settings_header = tk.Label(settings_frame, text='Settings')
         settings_header.grid(row=0, column=0, columnspan=2)
 
-        # TODO Remove deprecated label
-        region_label = tk.Label(settings_frame, text='Select Spotify Region')
-        region_label.grid(row=1, column=0)
-
         # TODO Implement caching
         self.cache_val = tk.BooleanVar()
         self.cache_val.set(self.settings['cache'])
