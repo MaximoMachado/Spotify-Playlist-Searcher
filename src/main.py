@@ -185,7 +185,7 @@ class Application(tk.Frame):
 
         # TODO Add scrollbar if too many playlist options
         playlists = self.spm.get_spotipy_client().current_user_playlists()
-        self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
+        self.playlist_exclude_data = []  # List of Tuple (BooleanVar, Playlist_URI)
         # Generates checkboxes for each user playlist
         for i, playlist in enumerate(playlists['items']):
             playlist_name = f'{playlist["name"]}'
@@ -195,8 +195,8 @@ class Application(tk.Frame):
                 check_val.set(False)
             else:
                 check_val.set(True)
-            self.check_vals.append((check_val, playlist["uri"]))
-            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
+            self.playlist_exclude_data.append((check_val, playlist["uri"]))
+            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.playlist_exclude_data[i][0])
             option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
 
         reset_btn = tk.Button(settings_frame, text='Reset Settings', command=self.reset_settings)
@@ -207,7 +207,7 @@ class Application(tk.Frame):
         Saves settings to self.settings before exiting.
         """
         self.settings['cache'] = self.cache_val.get()
-        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.check_vals if not check_val[0].get()]
+        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.playlist_exclude_data if not check_val[0].get()]
         self.settings_window.destroy()
 
     def reset_settings(self):
@@ -216,7 +216,7 @@ class Application(tk.Frame):
         """
         self.settings = {'cache': True, 'playlists_exclude': []}
         self.cache_val.set(True)
-        for val in self.check_vals:
+        for val in self.playlist_exclude_data:
             val[0].set(True)
 
     def playlists_toggle(self):
@@ -224,7 +224,7 @@ class Application(tk.Frame):
         Toggles all of the playlist checkboxes on or off
         """
         toggle_val = self.options_toggle_val.get()
-        for check_val in self.check_vals:
+        for check_val in self.playlist_exclude_data:
             check_val[0].set(toggle_val)
 
 
