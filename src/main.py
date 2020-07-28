@@ -39,11 +39,11 @@ class Application(tk.Frame):
         Initialises all widgets and puts onto the grid the widgets that appear at the start of the application.
         """
         # GUI widgets
-        self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
-        self.header.grid(row=0, column=0, columnspan=2, pady=10)
+        header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
+        header.grid(row=0, column=0, columnspan=2, pady=10)
 
-        self.settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
-        self.settings_btn.grid(row=0, column=1, sticky=tk.E)
+        settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
+        settings_btn.grid(row=0, column=1, sticky=tk.E)
 
         # Song Search
         self.create_song_widgets()
@@ -55,22 +55,22 @@ class Application(tk.Frame):
         """
         Initialises widgets related to searching for songs on Spotify
         """
-        self.song_search = tk.Frame(self.main_frame)
-        self.song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
+        song_search = tk.Frame(self.main_frame)
+        song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
 
-        self.search_bar = tk.Entry(self.song_search, width=50)
+        self.search_bar = tk.Entry(song_search, width=50)
         self.search_bar.grid(row=0, column=0)
         self.search_bar.focus()
         # Lambda expression is necessary because of self arg
         self.search_bar.bind('<Return>', lambda x: self.search_submit())
 
-        self.search_bar_submit = tk.Button(self.song_search, text="Search for Song", command=self.search_submit)
-        self.search_bar_submit.grid(row=0, column=1)
+        search_bar_submit = tk.Button(song_search, text="Search for Song", command=self.search_submit)
+        search_bar_submit.grid(row=0, column=1)
 
-        self.search_results_label = tk.Label(self.song_search, text='Song Results')
-        self.search_results_label.grid(row=1, column=0, columnspan=2)
+        search_results_label = tk.Label(song_search, text='Song Results')
+        search_results_label.grid(row=1, column=0, columnspan=2)
 
-        self.search_results = tk.Listbox(self.song_search, width=50)
+        self.search_results = tk.Listbox(song_search, width=50)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
@@ -79,15 +79,15 @@ class Application(tk.Frame):
         """
         Initialises widgets related to searching through playlists for a song. Does not display the playlist results listbox and label.
         """
-        self.playlist_search = tk.Frame(self.main_frame)
-        self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
+        playlist_search = tk.Frame(self.main_frame)
+        playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
 
-        self.playlist_search_btn = tk.Button(self.playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
+        self.playlist_search_btn = tk.Button(playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
         self.playlist_search_btn.grid(row=0, column=0, columnspan=2, pady=5)
 
         # Will be displayed at later point
-        self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
-        self.playlist_results = tk.Listbox(self.playlist_search, width=50)
+        self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
+        self.playlist_results = tk.Listbox(playlist_search, width=50)
 
     def search_submit(self):
         """
