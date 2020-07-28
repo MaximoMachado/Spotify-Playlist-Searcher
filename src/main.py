@@ -162,28 +162,29 @@ class Application(tk.Frame):
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
 
-        self.settings_frame = tk.Frame(self.settings_window)
-        self.settings_frame.grid(row=0, column=0)
+        settings_frame = tk.Frame(self.settings_window)
+        settings_frame.grid(row=0, column=0)
 
-        self.settings_header = tk.Label(self.settings_frame, text='Settings')
-        self.settings_header.grid(row=0, column=0, columnspan=2)
+        settings_header = tk.Label(settings_frame, text='Settings')
+        settings_header.grid(row=0, column=0, columnspan=2)
 
-        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
-        self.region_label.grid(row=1, column=0)
+        # TODO Remove deprecated label
+        region_label = tk.Label(settings_frame, text='Select Spotify Region')
+        region_label.grid(row=1, column=0)
 
         # TODO Implement caching
         self.cache_val = tk.BooleanVar()
         self.cache_val.set(self.settings['cache'])
-        self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=self.cache_val,
+        cache_toggle = tk.Checkbutton(settings_frame, variable=self.cache_val,
                                            text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
-        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
+        cache_toggle.grid(row=1, column=0, sticky=tk.W)
 
-        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
-        self.playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
+        playlist_options_frame = tk.LabelFrame(settings_frame, text='Playlists Searched')
+        playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
         self.options_toggle_val = tk.BooleanVar()
         self.options_toggle_val.set(True)
-        playlist_options_toggle = tk.Checkbutton(self.playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
+        playlist_options_toggle = tk.Checkbutton(playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
         playlist_options_toggle.grid(row=0, column=0, columnspan=2, sticky=tk.W)
 
         # TODO Add scrollbar if too many playlist options
@@ -199,10 +200,10 @@ class Application(tk.Frame):
             else:
                 check_val.set(True)
             self.check_vals.append((check_val, playlist["uri"]))
-            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
+            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
             option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
 
-        reset_btn = tk.Button(self.settings_frame, text='Reset Settings', command=self.reset_settings)
+        reset_btn = tk.Button(settings_frame, text='Reset Settings', command=self.reset_settings)
         reset_btn.grid(row=4, column=0, columnspan=2, pady=(0, 10))
 
     def exit_settings(self):
