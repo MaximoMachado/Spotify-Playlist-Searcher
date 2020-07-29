@@ -5,7 +5,6 @@ import json
 
 
 class Application(tk.Frame):
-    # TODO Refactor so that not all variables utilize self
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -39,11 +38,11 @@ class Application(tk.Frame):
         Initialises all widgets and puts onto the grid the widgets that appear at the start of the application.
         """
         # GUI widgets
-        self.header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
-        self.header.grid(row=0, column=0, columnspan=2, pady=10)
+        header = tk.Label(self.main_frame, text="Spotify Playlist Searcher", width=50)
+        header.grid(row=0, column=0, columnspan=2, pady=10)
 
-        self.settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
-        self.settings_btn.grid(row=0, column=1, sticky=tk.E)
+        settings_btn = tk.Button(self.main_frame, text="Settings", command=lambda: self.create_settings_widgets())
+        settings_btn.grid(row=0, column=1, sticky=tk.E)
 
         # Song Search
         self.create_song_widgets()
@@ -55,22 +54,22 @@ class Application(tk.Frame):
         """
         Initialises widgets related to searching for songs on Spotify
         """
-        self.song_search = tk.Frame(self.main_frame)
-        self.song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
+        song_search = tk.Frame(self.main_frame)
+        song_search.grid(row=1, column=0, columnspan=2, rowspan=3)
 
-        self.search_bar = tk.Entry(self.song_search, width=50)
+        self.search_bar = tk.Entry(song_search, width=50)
         self.search_bar.grid(row=0, column=0)
         self.search_bar.focus()
         # Lambda expression is necessary because of self arg
         self.search_bar.bind('<Return>', lambda x: self.search_submit())
 
-        self.search_bar_submit = tk.Button(self.song_search, text="Search for Song", command=self.search_submit)
-        self.search_bar_submit.grid(row=0, column=1)
+        search_bar_submit = tk.Button(song_search, text="Search for Song", command=self.search_submit)
+        search_bar_submit.grid(row=0, column=1)
 
-        self.search_results_label = tk.Label(self.song_search, text='Song Results')
-        self.search_results_label.grid(row=1, column=0, columnspan=2)
+        search_results_label = tk.Label(song_search, text='Song Results')
+        search_results_label.grid(row=1, column=0, columnspan=2)
 
-        self.search_results = tk.Listbox(self.song_search, width=50)
+        self.search_results = tk.Listbox(song_search, width=50)
         self.search_results.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         self.search_results.bind('<<ListboxSelect>>', lambda x: self.check_song_selection())
         self.search_results.bind('<Return>', lambda x: self.search_playlists())
@@ -79,15 +78,15 @@ class Application(tk.Frame):
         """
         Initialises widgets related to searching through playlists for a song. Does not display the playlist results listbox and label.
         """
-        self.playlist_search = tk.Frame(self.main_frame)
-        self.playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
+        playlist_search = tk.Frame(self.main_frame)
+        playlist_search.grid(row=4, column=0, columnspan=2, rowspan=3, pady=(0, 10))
 
-        self.playlist_search_btn = tk.Button(self.playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
+        self.playlist_search_btn = tk.Button(playlist_search, text="Search Playlists For Song", command=self.search_playlists, state=tk.DISABLED)
         self.playlist_search_btn.grid(row=0, column=0, columnspan=2, pady=5)
 
         # Will be displayed at later point
-        self.playlist_label = tk.Label(self.playlist_search, text='Playlist Results')
-        self.playlist_results = tk.Listbox(self.playlist_search, width=50)
+        self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
+        self.playlist_results = tk.Listbox(playlist_search, width=50)
 
     def search_submit(self):
         """
@@ -162,55 +161,52 @@ class Application(tk.Frame):
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
 
-        self.settings_frame = tk.Frame(self.settings_window)
-        self.settings_frame.grid(row=0, column=0)
+        settings_frame = tk.Frame(self.settings_window)
+        settings_frame.grid(row=0, column=0)
 
-        self.settings_header = tk.Label(self.settings_frame, text='Settings')
-        self.settings_header.grid(row=0, column=0, columnspan=2)
-
-        self.region_label = tk.Label(self.settings_frame, text='Select Spotify Region')
-        self.region_label.grid(row=1, column=0)
+        settings_header = tk.Label(settings_frame, text='Settings')
+        settings_header.grid(row=0, column=0, columnspan=2)
 
         # TODO Implement caching
-        self.cache_val = tk.BooleanVar()
-        self.cache_val.set(self.settings['cache'])
-        self.cache_toggle = tk.Checkbutton(self.settings_frame, variable=self.cache_val,
-                                           text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
-        self.cache_toggle.grid(row=1, column=0, sticky=tk.W)
+        self.cache_toggle_val = tk.BooleanVar()
+        self.cache_toggle_val.set(self.settings['cache'])
+        cache_toggle = tk.Checkbutton(settings_frame, variable=self.cache_toggle_val,
+                                      text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
+        cache_toggle.grid(row=1, column=0, sticky=tk.W)
 
-        self.playlist_options_frame = tk.LabelFrame(self.settings_frame, text='Playlists Searched')
-        self.playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
+        playlist_options_frame = tk.LabelFrame(settings_frame, text='Playlists Searched')
+        playlist_options_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
         self.options_toggle_val = tk.BooleanVar()
         self.options_toggle_val.set(True)
-        playlist_options_toggle = tk.Checkbutton(self.playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
+        playlist_options_toggle = tk.Checkbutton(playlist_options_frame, text='Toggle all playlists', variable=self.options_toggle_val, command=self.playlists_toggle)
         playlist_options_toggle.grid(row=0, column=0, columnspan=2, sticky=tk.W)
 
         # TODO Add scrollbar if too many playlist options
         playlists = self.spm.get_spotipy_client().current_user_playlists()
-        self.check_vals = []  # List of Tuple (BooleanVar, Playlist_URI)
+        self.playlist_exclude_data = []  # List of Tuple (Playlist_URI, BooleanVar)
         # Generates checkboxes for each user playlist
         for i, playlist in enumerate(playlists['items']):
             playlist_name = f'{playlist["name"]}'
 
-            check_val = tk.BooleanVar()
+            is_playlist_excluded = tk.BooleanVar()
             if playlist['uri'] in self.settings['playlists_exclude']:
-                check_val.set(False)
+                is_playlist_excluded.set(False)
             else:
-                check_val.set(True)
-            self.check_vals.append((check_val, playlist["uri"]))
-            option = tk.Checkbutton(self.playlist_options_frame, text=playlist_name, variable=self.check_vals[i][0])
+                is_playlist_excluded.set(True)
+            self.playlist_exclude_data.append((playlist["uri"], is_playlist_excluded))
+            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.playlist_exclude_data[i][1])
             option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
 
-        reset_btn = tk.Button(self.settings_frame, text='Reset Settings', command=self.reset_settings)
+        reset_btn = tk.Button(settings_frame, text='Reset Settings', command=self.reset_settings)
         reset_btn.grid(row=4, column=0, columnspan=2, pady=(0, 10))
 
     def exit_settings(self):
         """
         Saves settings to self.settings before exiting.
         """
-        self.settings['cache'] = self.cache_val.get()
-        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.check_vals if not check_val[0].get()]
+        self.settings['cache'] = self.cache_toggle_val.get()
+        self.settings['playlists_exclude'] = [check_val[0] for check_val in self.playlist_exclude_data if not check_val[1].get()]
         self.settings_window.destroy()
 
     def reset_settings(self):
@@ -218,17 +214,17 @@ class Application(tk.Frame):
         Resets settings to default values.
         """
         self.settings = {'cache': True, 'playlists_exclude': []}
-        self.cache_val.set(True)
-        for val in self.check_vals:
-            val[0].set(True)
+        self.cache_toggle_val.set(True)
+        for val in self.playlist_exclude_data:
+            val[1].set(True)
 
     def playlists_toggle(self):
         """
         Toggles all of the playlist checkboxes on or off
         """
         toggle_val = self.options_toggle_val.get()
-        for check_val in self.check_vals:
-            check_val[0].set(toggle_val)
+        for check_val in self.playlist_exclude_data:
+            check_val[1].set(toggle_val)
 
 
 if __name__ == '__main__':
