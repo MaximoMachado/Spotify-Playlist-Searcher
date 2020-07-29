@@ -169,10 +169,10 @@ class Application(tk.Frame):
         settings_header.grid(row=0, column=0, columnspan=2)
 
         # TODO Implement caching
-        self.cache_val = tk.BooleanVar()
-        self.cache_val.set(self.settings['cache'])
-        cache_toggle = tk.Checkbutton(settings_frame, variable=self.cache_val,
-                                           text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
+        self.cache_toggle_val = tk.BooleanVar()
+        self.cache_toggle_val.set(self.settings['cache'])
+        cache_toggle = tk.Checkbutton(settings_frame, variable=self.cache_toggle_val,
+                                      text='Enable Caching (Inaccurate results if the playlist have been modified recently)')
         cache_toggle.grid(row=1, column=0, sticky=tk.W)
 
         playlist_options_frame = tk.LabelFrame(settings_frame, text='Playlists Searched')
@@ -185,18 +185,18 @@ class Application(tk.Frame):
 
         # TODO Add scrollbar if too many playlist options
         playlists = self.spm.get_spotipy_client().current_user_playlists()
-        self.playlist_exclude_data = []  # List of Tuple (BooleanVar, Playlist_URI)
+        self.playlist_exclude_data = []  # List of Tuple (Playlist_URI, BooleanVar)
         # Generates checkboxes for each user playlist
         for i, playlist in enumerate(playlists['items']):
             playlist_name = f'{playlist["name"]}'
 
-            check_val = tk.BooleanVar()
+            is_playlist_excluded = tk.BooleanVar()
             if playlist['uri'] in self.settings['playlists_exclude']:
-                check_val.set(False)
+                is_playlist_excluded.set(False)
             else:
-                check_val.set(True)
-            self.playlist_exclude_data.append((check_val, playlist["uri"]))
-            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.playlist_exclude_data[i][0])
+                is_playlist_excluded.set(True)
+            self.playlist_exclude_data.append((playlist["uri"], is_playlist_excluded))
+            option = tk.Checkbutton(playlist_options_frame, text=playlist_name, variable=self.playlist_exclude_data[i][1])
             option.grid(row=i+1, column=0, columnspan=2, sticky=tk.W)
 
         reset_btn = tk.Button(settings_frame, text='Reset Settings', command=self.reset_settings)
@@ -206,8 +206,8 @@ class Application(tk.Frame):
         """
         Saves settings to self.settings before exiting.
         """
-        self.settings['cache'] = self.cache_val.get()
-        self.settings['playlists_exclude'] = [check_val[1] for check_val in self.playlist_exclude_data if not check_val[0].get()]
+        self.settings['cache'] = self.cache_toggle_val.get()
+        self.settings['playlists_exclude'] = [check_val[0] for check_val in self.playlist_exclude_data if not check_val[1].get()]
         self.settings_window.destroy()
 
     def reset_settings(self):
@@ -215,9 +215,9 @@ class Application(tk.Frame):
         Resets settings to default values.
         """
         self.settings = {'cache': True, 'playlists_exclude': []}
-        self.cache_val.set(True)
+        self.cache_toggle_val.set(True)
         for val in self.playlist_exclude_data:
-            val[0].set(True)
+            val[1].set(True)
 
     def playlists_toggle(self):
         """
@@ -225,7 +225,7 @@ class Application(tk.Frame):
         """
         toggle_val = self.options_toggle_val.get()
         for check_val in self.playlist_exclude_data:
-            check_val[0].set(toggle_val)
+            check_val[1].set(toggle_val)
 
 
 if __name__ == '__main__':
