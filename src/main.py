@@ -5,7 +5,6 @@ import json
 
 
 class Application(tk.Frame):
-    # TODO Refactor so that not all variables utilize self
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
