@@ -1,5 +1,6 @@
 from src.spotipy_manager import *
 import tkinter as tk
+from tkinter.ttk import Progressbar, Style
 import threading
 import json
 
@@ -88,6 +89,12 @@ class Application(tk.Frame):
         self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(playlist_search, width=50)
 
+        # Loading Bar
+        loading_style = Style()
+        loading_style.theme_use('alt')
+        loading_style.configure('TProgressbar', thickness=10)
+        self.playlist_loading = Progressbar(self.main_frame, style='TProgressbar', mode='indeterminate', length=150, maximum=50)
+
     def search_submit(self):
         """
         Takes search entered and displays the songs in the listbox. Also, initialises a dict mapping the song names to their Spotify uri.
@@ -149,8 +156,16 @@ class Application(tk.Frame):
                     self.playlist_results.insert(tk.END, name)
             else:
                 self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
+            # Remove Loading Bar
+            self.playlist_loading.stop()
+            self.playlist_loading.grid_forget()
 
+        # Start and draw Loading Bar
+        self.playlist_loading.grid(row=8, column=0, columnspan=2, sticky=tk.E, pady=(0, 10))
+        self.playlist_loading.start()
+        # Initialize thread
         thread = threading.Thread(target=lambda: threaded_search())
+        thread.daemon = True  # Prevents thread from running after application closes
         thread.start()
 
     def create_settings_widgets(self):
