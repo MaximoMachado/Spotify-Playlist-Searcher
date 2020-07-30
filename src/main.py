@@ -88,7 +88,7 @@ class Application(tk.Frame):
         # Will be displayed at later point
         self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(playlist_search, width=50)
-        self.playlist_loading = Progressbar(playlist_search, mode='indeterminate', length=200)
+        self.playlist_loading = Progressbar(playlist_search, mode='indeterminate', length=200, maximum=50)
 
     def search_submit(self):
         """
@@ -152,6 +152,7 @@ class Application(tk.Frame):
             else:
                 self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
             # Remove Loading Bar
+            self.playlist_loading.stop()
             self.playlist_loading.grid_forget()
 
         # Start Loading Bar
