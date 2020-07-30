@@ -1,5 +1,6 @@
 from src.spotipy_manager import *
 import tkinter as tk
+from tkinter.ttk import Progressbar
 import threading
 import json
 
@@ -87,6 +88,7 @@ class Application(tk.Frame):
         # Will be displayed at later point
         self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(playlist_search, width=50)
+        self.playlist_loading = Progressbar(playlist_search, mode='indeterminate', length=200)
 
     def search_submit(self):
         """
@@ -149,8 +151,15 @@ class Application(tk.Frame):
                     self.playlist_results.insert(tk.END, name)
             else:
                 self.playlist_results.insert(tk.END, 'The selected song is not found in any of your playlists.')
+            # Remove Loading Bar
+            self.playlist_loading.grid_forget()
 
+        # Start Loading Bar
+        self.playlist_loading.grid(row=3, column=0, columnspan=2, sticky=tk.E, pady=(10, 0))
+        self.playlist_loading.start()
+        # Initialize thread
         thread = threading.Thread(target=lambda: threaded_search())
+        thread.daemon = True  # Prevents thread from running after application closes
         thread.start()
 
     def create_settings_widgets(self):
