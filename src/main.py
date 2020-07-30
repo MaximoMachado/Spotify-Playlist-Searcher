@@ -91,7 +91,7 @@ class Application(tk.Frame):
 
         # Loading Bar
         loading_style = Style()
-        loading_style.theme_use('default')
+        loading_style.theme_use('alt')
         loading_style.configure('TProgressbar', thickness=10)
         self.playlist_loading = Progressbar(self.main_frame, style='TProgressbar', mode='indeterminate', length=150, maximum=50)
 
