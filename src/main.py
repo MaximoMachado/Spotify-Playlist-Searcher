@@ -88,7 +88,7 @@ class Application(tk.Frame):
         # Will be displayed at later point
         self.playlist_label = tk.Label(playlist_search, text='Playlist Results')
         self.playlist_results = tk.Listbox(playlist_search, width=50)
-        self.playlist_loading = Progressbar(playlist_search, mode='indeterminate', length=200, maximum=50)
+        self.playlist_loading = Progressbar(self.main_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=200, maximum=50)
 
     def search_submit(self):
         """
@@ -155,8 +155,8 @@ class Application(tk.Frame):
             self.playlist_loading.stop()
             self.playlist_loading.grid_forget()
 
-        # Start Loading Bar
-        self.playlist_loading.grid(row=3, column=0, columnspan=2, sticky=tk.E, pady=(10, 0))
+        # Start and draw Loading Bar
+        self.playlist_loading.grid(row=8, column=0, columnspan=2, sticky=tk.E, pady=(0, 10))
         self.playlist_loading.start()
         # Initialize thread
         thread = threading.Thread(target=lambda: threaded_search())
