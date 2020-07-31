@@ -100,10 +100,10 @@ class SpotipyManager:
         :return: Dict mapping playlist uri to set of track uris that are within that playlist
         """
         cached_playlists = {}  # Maps playlist uri to a set of track uri's
-        self._sort_songs_helper(playlists, cached_playlists)
+        self._cache_songs_helper(playlists, cached_playlists)
         while playlists['next']:
             playlists = self.sp.next(playlists)
-            self._sort_songs_helper(playlists, cached_playlists)
+            self._cache_songs_helper(playlists, cached_playlists)
 
         return cached_playlists
 
@@ -117,13 +117,11 @@ class SpotipyManager:
             tracks = self.sp.playlist_tracks(playlist['uri'])
             track_uris = set()
             for track in tracks['items']:
-                track_uris.add(track['uri'])
+                track_uris.add(track['track']['uri'])
             while tracks['next']:
                 tracks = self.sp.next(tracks)
                 for track in tracks['items']:
-                    track_uris.add(track['uri'])
+                    track_uris.add(track['track']['uri'])
 
             # Adds to dict
             dict_to_modify[playlist['uri']] = track_uris
-
-

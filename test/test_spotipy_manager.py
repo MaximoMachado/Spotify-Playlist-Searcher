@@ -5,15 +5,15 @@ from src.spotipy_manager import *
 class TestSpotipyManager(unittest.TestCase):
     def setUp(self):
         self.spm = SpotipyManager()
+        self.sp = self.spm.get_spotipy_client()
 
     def test_is_track_in_tracks(self):
-        sp = self.spm.get_spotipy_client()
         song_uri = 'spotify:track:0K8ML5cB3rGmNe1oOVTXPo'  # Melancolia by Caravan Palace
-        album = sp.album('spotify:album:5Pnctsm9Mi4D6W3DzWckA6')  # Album song is in
+        album = self.sp.album('spotify:album:5Pnctsm9Mi4D6W3DzWckA6')  # Album song is in
         self.assertTrue(is_track_in_tracks(song_uri, album['tracks']))
 
-        playlist = sp.playlist('spotify:playlist:37i9dQZF1DWYkaDif7Ztbp')  # African Heat Playlist
-        self.assertFalse(is_track_in_tracks(song_uri, sp.playlist_tracks(playlist['id'])))
+        playlist = self.sp.playlist('spotify:playlist:37i9dQZF1DWYkaDif7Ztbp')  # African Heat Playlist
+        self.assertFalse(is_track_in_tracks(song_uri, self.sp.playlist_tracks(playlist['id'])))
 
     def test_get_name_from_uri(self):
         self.assertEqual(self.spm.get_name_from_uri('spotify:track:5l08slmvFRUseHpq85neke'), 'NaNa', 'Track URI')
@@ -41,6 +41,17 @@ class TestSpotipyManager(unittest.TestCase):
         correct_set.add('spotify:playlist:37i9dQZF1Etq2nOAOxQGnV')
 
         self.assertEqual(playlists, correct_set)
+
+    def test_cache_songs_in_playlists(self):
+        playlists = self.sp.current_user_playlists()
+        cached_playlists = self.spm.cache_songs_in_playlists(playlists)
+
+        test_playlist_cached = cached_playlists['spotify:playlist:0YhxBIhx9BrFMrnAWL72PQ']
+        correct_set = {'spotify:track:14dCt3xXZvmoqorYnxspSj',
+                       'spotify:track:6WtiJthSHfbA5RIWcUU4TM',
+                       'spotify:track:2ZltjIqztEpZtafc8w0I9t',
+                       'spotify:track:5pS3GKYhlEAqSYM8JM27ki'}
+        self.assertEqual(test_playlist_cached, correct_set, 'SPS_TEST Playlist')
 
 
 if __name__ == '__main__':
