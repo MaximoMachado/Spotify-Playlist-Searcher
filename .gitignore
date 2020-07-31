@@ -2,4 +2,5 @@
 /venv/
 **/.cache*
 **/settings.json
+**/cache-playlists.json
 __pycache__
