@@ -27,7 +27,6 @@ class Application(tk.Frame):
             pass
 
         self.cache = {'time_created': datetime.now(timezone.utc), 'data': {}}
-        print(self.cache)
         # Load cache from file
         try:
             with open('./data/cache-playlists.json', 'r') as file:
