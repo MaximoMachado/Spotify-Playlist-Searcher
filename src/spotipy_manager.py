@@ -46,7 +46,7 @@ class SpotipyManager:
         :param uri: Unique id of object
         :return: Name of object from uri
         """
-        matched_uri = re.search('spotify:(track|playlist|album|artist):.*', uri)
+        matched_uri = re.search(r'spotify:(track|playlist|album|artist):.*', uri)
         if matched_uri:
             # Format of uri is spotify:type:id
             uri_type = matched_uri.group(1)

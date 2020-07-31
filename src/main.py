@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter.ttk import Progressbar, Style
 import threading
 import json
+import re
+from datetime import datetime, timezone
 
 
 class Application(tk.Frame):
@@ -24,6 +26,26 @@ class Application(tk.Frame):
         except FileNotFoundError:
             pass
 
+        self.cache = {'time_created': datetime.now(timezone.utc), 'data': {}}
+        print(self.cache)
+        # Load cache from file
+        try:
+            with open('./data/cache-playlists.json', 'r') as file:
+                self.cache = json.loads(file.read())
+                datetime_str = re.search(r'(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)', self.cache['time_created'])
+                current_time = datetime(int(datetime_str.group(3)),
+                                        int(datetime_str.group(2)),
+                                        int(datetime_str.group(1)),
+                                        hour=int(datetime_str.group(4)),
+                                        minute=int(datetime_str.group(5)),
+                                        second=int(datetime_str.group(6)))
+                self.cache['time_created'] = current_time
+        except FileNotFoundError:
+            pass
+
+        #if self.settings['cache']:
+            #self.cache_thread = threading.Thread()
+
         self.create_base_widgets()
 
     def save_and_exit(self):
@@ -32,6 +54,9 @@ class Application(tk.Frame):
         """
         with open('./data/settings.json', 'w+') as file:
             file.write(json.dumps(self.settings, indent=1))
+        with open('./data/cache-playlists.json', 'w+') as file:
+            self.cache['time_created'] = self.cache['time_created'].strftime("%d/%m/%Y %H:%M:%S")
+            file.write(json.dumps(self.cache, indent=1))
         self.master.destroy()
 
     def create_base_widgets(self):
