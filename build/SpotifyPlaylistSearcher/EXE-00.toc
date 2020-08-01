@@ -55,7 +55,7 @@
  [],
  False,
  False,
- 1596312111,
+ 1596314569,
  [('runw.exe',
    'c:\\users\\maxim\\pycharmprojects\\spotify playlist '
    'searcher\\venv\\lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit\\runw.exe',

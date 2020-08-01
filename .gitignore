@@ -4,3 +4,4 @@
 **/settings.*
 **/cache-playlists.*
 __pycache__
+./environ_vars.txt
