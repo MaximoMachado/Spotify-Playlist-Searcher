@@ -169,7 +169,7 @@ class Application(tk.Frame):
             if self.settings['cache'] and not self.cache['data'] is None:
                 playlist_uris = set()
                 for playlist_uri in self.cache['data']:
-                    if song_uri in self.cache['data'][playlist_uri]:
+                    if song_uri in self.cache['data'][playlist_uri] and playlist_uri not in self.settings['playlists_exclude']:
                         playlist_uris.add(playlist_uri)
             else:
                 playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
