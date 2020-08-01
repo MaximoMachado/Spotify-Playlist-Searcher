@@ -46,7 +46,7 @@ class SpotipyManager:
         :param uri: Unique id of object
         :return: Name of object from uri
         """
-        matched_uri = re.search('spotify:(track|playlist|album|artist):.*', uri)
+        matched_uri = re.search(r'spotify:(track|playlist|album|artist):.*', uri)
         if matched_uri:
             # Format of uri is spotify:type:id
             uri_type = matched_uri.group(1)
@@ -92,3 +92,36 @@ class SpotipyManager:
                     tracks = self.sp.next(tracks)
                     if is_track_in_tracks(song_uri, tracks):
                         set_to_modify.add(playlist['uri'])
+
+    def cache_songs_in_playlists(self, playlists):
+        """
+        Creates playlists format that takes less time to determine if track is within a playlist
+        :param playlists: Page object of playlists to iterate over
+        :return: Dict mapping playlist uri to set of track uris that are within that playlist
+        """
+        cached_playlists = {}  # Maps playlist uri to a set of track uri's
+        self._cache_songs_helper(playlists, cached_playlists)
+        while playlists['next']:
+            playlists = self.sp.next(playlists)
+            self._cache_songs_helper(playlists, cached_playlists)
+
+        return cached_playlists
+
+    def _cache_songs_helper(self, playlists, dict_to_modify):
+        """
+        Iterates over the tracks within the playlists and places them within a set for quicker accessing
+        :param playlists: Page object of playlists to iterate over
+        :param dict_to_modify: Dict that stores the cached playlists
+        """
+        for playlist in playlists['items']:
+            tracks = self.sp.playlist_tracks(playlist['uri'])
+            track_uris = set()
+            for track in tracks['items']:
+                track_uris.add(track['track']['uri'])
+            while tracks['next']:
+                tracks = self.sp.next(tracks)
+                for track in tracks['items']:
+                    track_uris.add(track['track']['uri'])
+
+            # Adds to dict
+            dict_to_modify[playlist['uri']] = track_uris

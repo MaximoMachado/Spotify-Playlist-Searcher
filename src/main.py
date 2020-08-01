@@ -2,7 +2,8 @@ from src.spotipy_manager import *
 import tkinter as tk
 from tkinter.ttk import Progressbar, Style
 import threading
-import json
+import pickle
+from datetime import datetime, timezone
 
 
 class Application(tk.Frame):
@@ -19,10 +20,22 @@ class Application(tk.Frame):
         self.settings = {'cache': True, 'playlists_exclude': []}
         # Load settings from file
         try:
-            with open('./data/settings.json', 'r') as file:
-                self.settings = json.loads(file.read())
+            with open('./data/settings.pickle', 'rb') as file:
+                self.settings = pickle.load(file)
         except FileNotFoundError:
             pass
+
+        self.cache = {'date_modified': datetime.now(timezone.utc), 'data': None}
+        # Load cache from file
+        try:
+            with open('./data/cache-playlists.pickle', 'rb') as file:
+                self.cache = pickle.load(file)
+        except FileNotFoundError:
+            pass
+
+        # Thread created even if settings disable cache in case setting is changed later on.
+        self.cache_thread = threading.Thread(target=self.cache_playlists_helper)
+        self.cache_thread.start()
 
         self.create_base_widgets()
 
@@ -30,9 +43,18 @@ class Application(tk.Frame):
         """
         Saves self.settings to a file and exits
         """
-        with open('./data/settings.json', 'w+') as file:
-            file.write(json.dumps(self.settings, indent=1))
+        with open('./data/settings.pickle', 'wb+') as file:
+            pickle.dump(self.settings, file)
+        with open('./data/cache-playlists.pickle', 'wb+') as file:
+            pickle.dump(self.cache, file)
         self.master.destroy()
+
+    def cache_playlists_helper(self):
+        """
+        Sets cache data to correct format of playlists. Function should only called in a thread.
+        """
+        playlists = self.spm.get_spotipy_client().current_user_playlists()
+        self.cache['data'] = self.spm.cache_songs_in_playlists(playlists)
 
     def create_base_widgets(self):
         """
@@ -143,7 +165,14 @@ class Application(tk.Frame):
                 return
 
             song_uri = self.song_dict[song_selected]
-            playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
+            # If caching is enabled and the cache has data, use cached data
+            if self.settings['cache'] and not self.cache['data'] is None:
+                playlist_uris = set()
+                for playlist_uri in self.cache['data']:
+                    if song_uri in self.cache['data'][playlist_uri] and playlist_uri not in self.settings['playlists_exclude']:
+                        playlist_uris.add(playlist_uri)
+            else:
+                playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
             playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
             # Displaying playlist listbox and then inserting playlists
@@ -163,6 +192,7 @@ class Application(tk.Frame):
         # Start and draw Loading Bar
         self.playlist_loading.grid(row=8, column=0, columnspan=2, sticky=tk.E, pady=(0, 10))
         self.playlist_loading.start()
+
         # Initialize thread
         thread = threading.Thread(target=lambda: threaded_search())
         thread.daemon = True  # Prevents thread from running after application closes

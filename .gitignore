@@ -1,5 +1,6 @@
 /.idea/
 /venv/
 **/.cache*
-**/settings.json
+**/settings.*
+**/cache-playlists.*
 __pycache__
