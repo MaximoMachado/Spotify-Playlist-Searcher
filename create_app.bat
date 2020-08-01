@@ -1,0 +1,1 @@
+pyinstaller -w ./src/main.py --add-data ./data/;./data/ -n SpotifyPlaylistSearcher
