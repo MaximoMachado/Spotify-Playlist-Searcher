@@ -2,8 +2,7 @@ from src.spotipy_manager import *
 import tkinter as tk
 from tkinter.ttk import Progressbar, Style
 import threading
-import json
-import re
+import pickle
 from datetime import datetime, timezone
 
 
@@ -21,24 +20,16 @@ class Application(tk.Frame):
         self.settings = {'cache': True, 'playlists_exclude': []}
         # Load settings from file
         try:
-            with open('./data/settings.json', 'r') as file:
-                self.settings = json.loads(file.read())
+            with open('./data/settings.pickle', 'rb') as file:
+                self.settings = pickle.load(file)
         except FileNotFoundError:
             pass
 
         self.cache = {'time_created': datetime.now(timezone.utc), 'data': None}
         # Load cache from file
         try:
-            with open('./data/cache-playlists.json', 'r') as file:
-                self.cache = json.loads(file.read())
-                datetime_str = re.search(r'(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)', self.cache['time_created'])
-                current_time = datetime(int(datetime_str.group(3)),
-                                        int(datetime_str.group(2)),
-                                        int(datetime_str.group(1)),
-                                        hour=int(datetime_str.group(4)),
-                                        minute=int(datetime_str.group(5)),
-                                        second=int(datetime_str.group(6)))
-                self.cache['time_created'] = current_time
+            with open('./data/cache-playlists.pickle', 'rb') as file:
+                self.cache = pickle.load(file)
         except FileNotFoundError:
             pass
 
@@ -52,11 +43,10 @@ class Application(tk.Frame):
         """
         Saves self.settings to a file and exits
         """
-        with open('./data/settings.json', 'w+') as file:
-            file.write(json.dumps(self.settings, indent=1))
-        with open('./data/cache-playlists.json', 'w+') as file:
-            self.cache['time_created'] = self.cache['time_created'].strftime("%d/%m/%Y %H:%M:%S")
-            file.write(json.dumps(self.cache, indent=1))
+        with open('./data/settings.pickle', 'wb+') as file:
+            pickle.dump(self.settings, file)
+        with open('./data/cache-playlists.pickle', 'wb+') as file:
+            pickle.dump(self.cache, file)
         self.master.destroy()
 
     def cache_playlists_helper(self):
