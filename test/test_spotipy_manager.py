@@ -1,7 +1,7 @@
 import unittest
 from src.spotipy_manager import *
 
-
+# TODO Get specific user's playlists rather than current user's for testing
 class TestSpotipyManager(unittest.TestCase):
     def setUp(self):
         self.spm = SpotipyManager()

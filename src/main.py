@@ -50,6 +50,9 @@ class Application(tk.Frame):
         self.master.destroy()
 
     def cache_playlists_helper(self):
+        """
+        Sets cache data to correct format of playlists. Function should only called in a thread.
+        """
         playlists = self.spm.get_spotipy_client().current_user_playlists()
         self.cache['data'] = self.spm.cache_songs_in_playlists(playlists)
 
