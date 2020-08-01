@@ -33,9 +33,9 @@ class Application(tk.Frame):
         except FileNotFoundError:
             pass
 
-        if self.settings['cache']:
-            self.cache_thread = threading.Thread(target=self.cache_playlists_helper)
-            self.cache_thread.start()
+        # Thread created even if settings disable cache in case setting is changed later on.
+        self.cache_thread = threading.Thread(target=self.cache_playlists_helper)
+        self.cache_thread.start()
 
         self.create_base_widgets()
 
@@ -165,7 +165,14 @@ class Application(tk.Frame):
                 return
 
             song_uri = self.song_dict[song_selected]
-            playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
+            # If caching is enabled and the cache has data, use cached data
+            if self.settings['cache'] and not self.cache['data'] is None:
+                playlist_uris = set()
+                for playlist_uri in self.cache['data']:
+                    if song_uri in self.cache['data'][playlist_uri]:
+                        playlist_uris.add(playlist_uri)
+            else:
+                playlist_uris = self.spm.find_song_in_playlists(song_uri, self.settings['playlists_exclude'])
             playlist_names = [self.spm.get_name_from_uri(uri) for uri in playlist_uris]
 
             # Displaying playlist listbox and then inserting playlists
@@ -185,6 +192,7 @@ class Application(tk.Frame):
         # Start and draw Loading Bar
         self.playlist_loading.grid(row=8, column=0, columnspan=2, sticky=tk.E, pady=(0, 10))
         self.playlist_loading.start()
+
         # Initialize thread
         thread = threading.Thread(target=lambda: threaded_search())
         thread.daemon = True  # Prevents thread from running after application closes
