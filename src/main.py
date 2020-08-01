@@ -10,6 +10,7 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
+        self.master.resizable(0, 0)
         self.master.protocol("WM_DELETE_WINDOW", self.save_and_exit)
 
         self.main_frame = tk.Frame(master)
@@ -204,6 +205,7 @@ class Application(tk.Frame):
         Creates a new window for settings related to the application
         """
         self.settings_window = tk.Toplevel(self.master)
+        self.settings_window.resizable(0, 0)
         self.settings_window.title('Settings')
         self.settings_window.protocol("WM_DELETE_WINDOW", self.exit_settings)
 
