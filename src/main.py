@@ -26,7 +26,7 @@ class Application(tk.Frame):
         except FileNotFoundError:
             pass
 
-        self.cache = {'time_created': datetime.now(timezone.utc), 'data': {}}
+        self.cache = {'time_created': datetime.now(timezone.utc), 'data': None}
         # Load cache from file
         try:
             with open('./data/cache-playlists.json', 'r') as file:
@@ -42,8 +42,9 @@ class Application(tk.Frame):
         except FileNotFoundError:
             pass
 
-        #if self.settings['cache']:
-            #self.cache_thread = threading.Thread()
+        if self.settings['cache']:
+            self.cache_thread = threading.Thread(target=self.cache_playlists_helper)
+            self.cache_thread.start()
 
         self.create_base_widgets()
 
@@ -57,6 +58,10 @@ class Application(tk.Frame):
             self.cache['time_created'] = self.cache['time_created'].strftime("%d/%m/%Y %H:%M:%S")
             file.write(json.dumps(self.cache, indent=1))
         self.master.destroy()
+
+    def cache_playlists_helper(self):
+        playlists = self.spm.get_spotipy_client().current_user_playlists()
+        self.cache['data'] = self.spm.cache_songs_in_playlists(playlists)
 
     def create_base_widgets(self):
         """
