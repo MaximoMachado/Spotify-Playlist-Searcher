@@ -34,8 +34,9 @@ class Application(tk.Frame):
             pass
 
         # Thread created even if settings disable cache in case setting is changed later on.
-        self.cache_thread = threading.Thread(target=self.cache_playlists_helper)
-        self.cache_thread.start()
+        cache_thread = threading.Thread(target=self.cache_playlists_helper)
+        cache_thread.daemon = True
+        cache_thread.start()
 
         self.create_base_widgets()
 
