@@ -25,7 +25,7 @@ class Application(tk.Frame):
         except FileNotFoundError:
             pass
 
-        self.cache = {'time_created': datetime.now(timezone.utc), 'data': None}
+        self.cache = {'date_modified': datetime.now(timezone.utc), 'data': None}
         # Load cache from file
         try:
             with open('./data/cache-playlists.pickle', 'rb') as file:
